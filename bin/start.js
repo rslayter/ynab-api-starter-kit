@@ -15,10 +15,7 @@ const files = [
   'index.html',
   'package.json',
   'README.md',
-  'webpack.config.js',
-  'node_modules/c3/c3.min.css',
-  'node_modules/d3/dist/d3.min.js',
-  'node_modules/c3/c3.min.js'
+  'webpack.config.js'
 ];
 
 // Main
