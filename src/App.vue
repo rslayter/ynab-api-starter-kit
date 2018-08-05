@@ -2,70 +2,43 @@
   <div id="app">
     <Nav />
     <div class="container">
-
-      <!-- Display a loading message if loading -->
       <h1 v-if="loading" class="display-4">Loading...</h1>
-
-      <!-- Display an error if we got one -->
-      <div v-if="error">
-        <h1 class="display-4">Oops!</h1>
-        <p class="lead">{{error}}</p>
-        <button class="btn btn-primary" @click="resetToken">Try Again &gt;</button>
-      </div>
-
-      <!-- Otherwise show our app contents -->
       <div v-else>
-
-        <!-- If we dont have a token ask the user to authorize with YNAB -->
-        <form v-if="!ynab.token">
-          <h1 class="display-4">Congrats!</h1>
-          <p class="lead">You have successfully started a new YNAB API Application!</p>
-          <ul>
-            <li>Please go to your <a href="https://app.youneedabudget.com/settings/developer" target="_blank" rel="noopener noreferrer">YNAB Developer Settings</a> and create a new OAuth Application.</li>
-            <li>Copy your client ID and redirect URI into <em>src/config.json</em>.</li>
-            <li>Then build your amazing app!</li>
-          </ul>
-          <p>If you have any questions please reach out to us at <strong>api@youneedabudget.com</strong>.</p>
-          <p>&nbsp;</p>
-
-          <div class="form-group">
-            <h1 class="display-5">Hello!</h1>
-            <p class="lead">If you would like to use this App, please authorize with YNAB!</p>
-            <button @click="authorizeWithYNAB" class="btn btn-primary">Authorize This App With YNAB &gt;</button>
-          </div>
-        </form>
-
-        <!-- Otherwise if we have a token, show the budget select -->
-        <Budgets v-else-if="!budgetId" :budgets="budgets" :selectBudget="selectBudget" />
-
-        <!-- If a budget has been selected, display transactions from that budget -->
-        <div v-else>
-          <Transactions :transactions="transactions" />
-          <button class="btn btn-info" @click="budgetId = null">&lt; Select Another Budget</button>
+        <div v-if="error">
+          <h1 class="display-4">Oops!</h1>
+          <p class="lead">{{error}}</p>
+          <button class="btn btn-primary" @click="resetToken">Try Again &gt;</button>
         </div>
-
+        <div v-else>
+          <form v-if="!ynab.token">
+            <div class="form-group">
+              <h1 class="display-5">Hello!</h1>
+              <p class="lead">If you would like to use this App, please authorize with YNAB!</p>
+              <button @click="authorizeWithYNAB" class="btn btn-primary">Authorize This App With YNAB &gt;</button>
+            </div>
+          </form>
+          <Budgets v-else-if="!budgetId" :budgets="budgets" :selectBudget="selectBudget" />
+          <div v-else>
+            <!-- Show the Dashboard for the selected budget -->
+            <CategoryBurndown :budgetId="budgetId" :categories="categories" :api="api"/>
+            <button class="btn btn-info" @click="budgetId = null">&lt; Select Another Budget</button>
+          </div>
+        </div>
       </div>
-
       <Footer />
     </div>
   </div>
 </template>
 
 <script>
-// Hooray! Here comes YNAB!
 import * as ynab from 'ynab';
-
-// Import our config for YNAB
 import config from './config.json';
-
-// Import Our Components to Compose Our App
 import Nav from './components/Nav.vue';
 import Footer from './components/Footer.vue';
 import Budgets from './components/Budgets.vue';
-import Transactions from './components/Transactions.vue';
+import CategoryBurndown from './components/CategoryBurndown.vue';
 
 export default {
-  // The data to feed our templates
   data () {
     return {
       ynab: {
@@ -79,6 +52,7 @@ export default {
       budgetId: null,
       budgets: [],
       transactions: [],
+      categories: [],
     }
   },
   // When this component is created, check whether we need to get a token,
@@ -107,7 +81,7 @@ export default {
         this.loading = false;
       });
     },
-    // This selects a budget and gets all the transactions in that budget
+    // This selects a budget and gets all the categories and transactions in that budget
     selectBudget(id) {
       this.loading = true;
       this.error = null;
@@ -120,6 +94,21 @@ export default {
       }).finally(() => {
         this.loading = false;
       });
+
+      this.api.categories.getCategories(id).then((res) => {
+        this.categories = res.data.category_groups
+        .filter(category => {
+          return category.name != "Internal Master Category" && category.name != "Credit Card Payments" && category.name != "Hidden Categories"
+        })
+        .reduce((categoryAcc, category_group) => {
+          return categoryAcc.concat(category_group.categories);
+        }, []);
+      }).catch((err) => {
+        this.error = err.error.detail;
+      }).finally(() => {
+        this.loading = false;
+      });
+
     },
     // This builds a URI to get an access token from YNAB
     // https://api.youneedabudget.com/#outh-applications
@@ -159,7 +148,7 @@ export default {
     Nav,
     Footer,
     Budgets,
-    Transactions
+    CategoryBurndown
   }
 }
 </script>
