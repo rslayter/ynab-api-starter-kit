@@ -4,7 +4,7 @@ A simple web app to show a dashboard of the most important details of your budge
 
 ## Demo
 
-View a [live demo](https://rslayter.github.io/ynab-dashboard/) of the project!
+View a [live demo](https://rslayter.github.io/ynab-api-starter-kit/) of the project!
 
 ## Usage
 
