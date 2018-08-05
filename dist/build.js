@@ -14035,7 +14035,7 @@ var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/components/Transactions.vue"
+Component.options.__file = "src/components/CategoryBurndown.vue"
 
 /* hot reload */
 if (false) {(function () {
