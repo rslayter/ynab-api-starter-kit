@@ -13717,7 +13717,7 @@ module.exports = self.fetch.bind(self);
 /* 24 */
 /***/ (function(module, exports) {
 
-module.exports = {"clientId":"a56948bc5fe6e80c1a241151611a53350518c119ea413de4375694ebebbd68e0","redirectUri":"https://rslayter.github.io/ynab-api-starter-kit/"}
+module.exports = {"clientId":"e5a021da2a19f7c0c93879f37ab0f1b65f61ce8cc9a808793513fb605013edbc","redirectUri":"https://rslayter.github.io/ynab-api-starter-kit/"}
 
 /***/ }),
 /* 25 */
