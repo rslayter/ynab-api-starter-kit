@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -204,187 +204,9 @@ module.exports = g;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_json__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__config_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_Nav_vue__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_Footer_vue__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Budgets_vue__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_Transactions_vue__ = __webpack_require__(31);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-// Hooray! Here comes YNAB!
-
-
-// Import our config for YNAB
-
-
-// Import Our Components to Compose Our App
-
-
-
-
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-  // The data to feed our templates
-  data () {
-    return {
-      ynab: {
-        clientId: __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.clientId,
-        redirectUri: __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.redirectUri,
-        token: null,
-        api: null,
-      },
-      loading: false,
-      error: null,
-      budgetId: null,
-      budgets: [],
-      transactions: [],
-    }
-  },
-  // When this component is created, check whether we need to get a token,
-  // budgets or display the transactions
-  created() {
-    this.ynab.token = this.findYNABToken();
-    if (this.ynab.token) {
-      this.api = new __WEBPACK_IMPORTED_MODULE_0_ynab__["a" /* api */](this.ynab.token);
-      if (!this.budgetId) {
-        this.getBudgets();
-      } else {
-        this.selectBudget(this.budgetId);
-      }
-    }
-  },
-  methods: {
-    // This uses the YNAB API to get a list of budgets
-    getBudgets() {
-      this.loading = true;
-      this.error = null;
-      this.api.budgets.getBudgets().then((res) => {
-        this.budgets = res.data.budgets;
-      }).catch((err) => {
-        this.error = err.error.detail;
-      }).finally(() => {
-        this.loading = false;
-      });
-    },
-    // This selects a budget and gets all the transactions in that budget
-    selectBudget(id) {
-      this.loading = true;
-      this.error = null;
-      this.budgetId = id;
-      this.transactions = [];
-      this.api.transactions.getTransactions(id).then((res) => {
-        this.transactions = res.data.transactions;
-      }).catch((err) => {
-        this.error = err.error.detail;
-      }).finally(() => {
-        this.loading = false;
-      });
-    },
-    // This builds a URI to get an access token from YNAB
-    // https://api.youneedabudget.com/#outh-applications
-    authorizeWithYNAB(e) {
-      e.preventDefault();
-      const uri = `https://app.youneedabudget.com/oauth/authorize?client_id=${this.ynab.clientId}&redirect_uri=${this.ynab.redirectUri}&response_type=token`;
-      location.replace(uri);
-    },
-    // Method to find a YNAB token
-    // First it looks in the location.hash and then sessionStorage
-    findYNABToken() {
-      let token = null;
-      const search = window.location.hash.substring(1).replace(/&/g, '","').replace(/=/g,'":"');
-      if (search && search !== '') {
-        // Try to get access_token from the hash returned by OAuth
-        const params = JSON.parse('{"' + search + '"}', function(key, value) {
-          return key === '' ? value : decodeURIComponent(value);
-        });
-        token = params.access_token;
-        sessionStorage.setItem('ynab_access_token', token);
-        window.location.hash = '';
-      } else {
-        // Otherwise try sessionStorage
-        token = sessionStorage.getItem('ynab_access_token');
-      }
-      return token;
-    },
-    // Clear the token and start authorization over
-    resetToken() {
-      sessionStorage.removeItem('ynab_access_token');
-      this.ynab.token = null;
-      this.error = null;
-    }
-  },
-  // Specify which components we want to make available to our templates
-  components: {
-    Nav: __WEBPACK_IMPORTED_MODULE_2__components_Nav_vue__["a" /* default */],
-    Footer: __WEBPACK_IMPORTED_MODULE_3__components_Footer_vue__["a" /* default */],
-    Budgets: __WEBPACK_IMPORTED_MODULE_4__components_Budgets_vue__["a" /* default */],
-    Transactions: __WEBPACK_IMPORTED_MODULE_5__components_Transactions_vue__["a" /* default */]
-  }
-});
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__configuration__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__configuration__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(24);
 /* unused harmony namespace reexport */
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_2__utils__["a"]; });
 
@@ -482,6 +304,184 @@ class api {
 
 
 /***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_json__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__config_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_Nav_vue__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_Footer_vue__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Budgets_vue__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_CategoryBurndown_vue__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_RecentTransactions_vue__ = __webpack_require__(34);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  data () {
+    return {
+      ynab: {
+        clientId: __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.clientId,
+        redirectUri: __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.redirectUri,
+        token: null,
+        api: null,
+      },
+      loading: false,
+      error: null,
+      budgetId: null,
+      budgets: [],
+      transactions: [],
+      categories: [],
+      recentTransactions: [],
+      recentCategories: []
+    }
+  },
+  // When this component is created, check whether we need to get a token,
+  // budgets or display the transactions
+  created() {
+    this.ynab.token = __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.token;
+    if (this.ynab.token) {
+      this.api = new __WEBPACK_IMPORTED_MODULE_0_ynab__["a" /* api */](this.ynab.token);
+      if (!this.budgetId) {
+        this.getBudgets();
+      } else {
+        this.selectBudget(this.budgetId);
+      }
+    }
+  },
+  methods: {
+    // This uses the YNAB API to get a list of budgets
+    getBudgets() {
+      this.loading = true;
+      this.error = null;
+      this.api.budgets.getBudgets().then((res) => {
+        this.budgets = res.data.budgets;
+      }).catch((err) => {
+        this.error = err.error.detail;
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
+    // This selects a budget and gets all the categories and transactions in that budget
+    selectBudget(id) {
+      this.loading = true;
+      this.error = null;
+      this.budgetId = id;
+      this.transactions = [];
+      this.api.transactions.getTransactions(id).then((res) => {
+        this.transactions = res.data.transactions;
+        this.parseTransactions();
+      }).catch((err) => {
+        this.error = err.error.detail;
+      }).finally(() => {
+        this.loading = false;
+      });
+
+      this.api.categories.getCategories(id).then((res) => {
+        this.categories = res.data.category_groups
+        .filter(category => {
+          return category.name != "Internal Master Category" && category.name != "Credit Card Payments" && category.name != "Hidden Categories"
+        })
+        .reduce((categoryAcc, category_group) => {
+          return categoryAcc.concat(category_group.categories);
+        }, []);
+      }).catch((err) => {
+        this.error = err.error.detail;
+      }).finally(() => {
+        this.loading = false;
+      });
+
+    },
+    // This builds a URI to get an access token from YNAB
+    // https://api.youneedabudget.com/#outh-applications
+    authorizeWithYNAB(e) {
+      e.preventDefault();
+      const uri = `https://app.youneedabudget.com/oauth/authorize?client_id=${this.ynab.clientId}&redirect_uri=${this.ynab.redirectUri}&response_type=token`;
+      location.replace(uri);
+    },
+    // Method to find a YNAB token
+    // First it looks in the location.hash and then sessionStorage
+    findYNABToken() {
+      let token = null;
+      const search = window.location.hash.substring(1).replace(/&/g, '","').replace(/=/g,'":"');
+      if (search && search !== '') {
+        // Try to get access_token from the hash returned by OAuth
+        const params = JSON.parse('{"' + search + '"}', function(key, value) {
+          return key === '' ? value : decodeURIComponent(value);
+        });
+        token = params.access_token;
+        sessionStorage.setItem('ynab_access_token', token);
+        window.location.hash = '';
+      } else {
+        // Otherwise try sessionStorage
+        token = sessionStorage.getItem('ynab_access_token');
+      }
+      return token;
+    },
+    // Clear the token and start authorization over
+    resetToken() {
+      sessionStorage.removeItem('ynab_access_token');
+      this.ynab.token = null;
+      this.error = null;
+    },
+    //parse transaction data to provide new data models
+    parseTransactions() {
+      this.recentTransactions = this.transactions.slice(Math.max(this.transactions.length - 10, 0)).reverse();
+    }
+  },
+  // Specify which components we want to make available to our templates
+  components: {
+    Nav: __WEBPACK_IMPORTED_MODULE_2__components_Nav_vue__["a" /* default */],
+    Footer: __WEBPACK_IMPORTED_MODULE_3__components_Footer_vue__["a" /* default */],
+    Budgets: __WEBPACK_IMPORTED_MODULE_4__components_Budgets_vue__["a" /* default */],
+    RecentTransactions: __WEBPACK_IMPORTED_MODULE_6__components_RecentTransactions_vue__["a" /* default */],
+    CategoryBurndown: __WEBPACK_IMPORTED_MODULE_5__components_CategoryBurndown_vue__["a" /* default */]
+  }
+});
+
+
+/***/ }),
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -490,9 +490,10 @@ class api {
 /* unused harmony export SaveTransaction */
 /* unused harmony export ScheduledTransactionSummary */
 /* unused harmony export TransactionSummary */
+/* unused harmony export HybridTransaction */
 /* unused harmony export ScheduledTransactionDetail */
 /* unused harmony export TransactionDetail */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_url__);
 // tslint:disable
 /**
@@ -509,8 +510,8 @@ class api {
 
 // Requiring portable-fetch like this ensures that we have a global fetch function
 // That makes it easier to override with modules like fetch-mock
-__webpack_require__(21);
-const USER_AGENT = "api_client/js/0.12.0";
+__webpack_require__(22);
+const USER_AGENT = "api_client/js/0.14.0";
 function convertDateToFullDateStringFormat(date) {
     // Convert to RFC 3339 "full-date" format, like "2017-11-27"
     if (date instanceof Date) {
@@ -686,6 +687,45 @@ var TransactionSummary;
         FlagColorEnum[FlagColorEnum["Purple"] = 'purple'] = "Purple";
     })(FlagColorEnum = TransactionSummary.FlagColorEnum || (TransactionSummary.FlagColorEnum = {}));
 })(TransactionSummary || (TransactionSummary = {}));
+/**
+ * @export
+ * @namespace HybridTransaction
+ */
+var HybridTransaction;
+(function (HybridTransaction) {
+    /**
+     * @export
+     * @enum {string}
+     */
+    let ClearedEnum;
+    (function (ClearedEnum) {
+        ClearedEnum[ClearedEnum["Cleared"] = 'cleared'] = "Cleared";
+        ClearedEnum[ClearedEnum["Uncleared"] = 'uncleared'] = "Uncleared";
+        ClearedEnum[ClearedEnum["Reconciled"] = 'reconciled'] = "Reconciled";
+    })(ClearedEnum = HybridTransaction.ClearedEnum || (HybridTransaction.ClearedEnum = {}));
+    /**
+     * @export
+     * @enum {string}
+     */
+    let FlagColorEnum;
+    (function (FlagColorEnum) {
+        FlagColorEnum[FlagColorEnum["Red"] = 'red'] = "Red";
+        FlagColorEnum[FlagColorEnum["Orange"] = 'orange'] = "Orange";
+        FlagColorEnum[FlagColorEnum["Yellow"] = 'yellow'] = "Yellow";
+        FlagColorEnum[FlagColorEnum["Green"] = 'green'] = "Green";
+        FlagColorEnum[FlagColorEnum["Blue"] = 'blue'] = "Blue";
+        FlagColorEnum[FlagColorEnum["Purple"] = 'purple'] = "Purple";
+    })(FlagColorEnum = HybridTransaction.FlagColorEnum || (HybridTransaction.FlagColorEnum = {}));
+    /**
+     * @export
+     * @enum {string}
+     */
+    let TypeEnum;
+    (function (TypeEnum) {
+        TypeEnum[TypeEnum["Transaction"] = 'transaction'] = "Transaction";
+        TypeEnum[TypeEnum["Subtransaction"] = 'subtransaction'] = "Subtransaction";
+    })(TypeEnum = HybridTransaction.TypeEnum || (HybridTransaction.TypeEnum = {}));
+})(HybridTransaction || (HybridTransaction = {}));
 /**
  * @export
  * @namespace ScheduledTransactionDetail
@@ -2511,6 +2551,50 @@ const TransactionsApiFetchParamCreator = function (configuration) {
             };
         },
         /**
+         * Returns all transactions for a specified payee
+         * @summary List payee transactions
+         * @param {string} budget_id - The ID of the Budget.
+         * @param {string} payee_id - The ID of the Payee.
+         * @param {Date} [since_date] - Only return transactions on or after this date.
+         * @param {*} [options] - Override http request options.
+         * @throws {RequiredError}
+         */
+        getTransactionsByPayee(budget_id, payee_id, since_date, options = {}) {
+            // verify required parameter 'budget_id' is not null or undefined
+            if (budget_id === null || budget_id === undefined) {
+                throw new RequiredError('budget_id', 'Required parameter budget_id was null or undefined when calling getTransactionsByPayee.');
+            }
+            // verify required parameter 'payee_id' is not null or undefined
+            if (payee_id === null || payee_id === undefined) {
+                throw new RequiredError('payee_id', 'Required parameter payee_id was null or undefined when calling getTransactionsByPayee.');
+            }
+            const localVarPath = `/budgets/{budget_id}/payees/{payee_id}/transactions`
+                .replace(`{${"budget_id"}}`, encodeURIComponent(String(budget_id)))
+                .replace(`{${"payee_id"}}`, encodeURIComponent(String(payee_id)));
+            const localVarUrlObj = __WEBPACK_IMPORTED_MODULE_0_url__["parse"](localVarPath, true);
+            const localVarRequestOptions = Object.assign({ method: 'GET' }, options);
+            const localVarHeaderParameter = {};
+            const localVarQueryParameter = {};
+            localVarHeaderParameter["User-Agent"] = USER_AGENT;
+            localVarHeaderParameter["Accept"] = "application/json";
+            // authentication bearer required
+            if (configuration && configuration.apiKey) {
+                const localVarApiKeyValue = configuration.apiKey;
+                localVarHeaderParameter["Authorization"] = localVarApiKeyValue;
+            }
+            if (since_date !== undefined) {
+                localVarQueryParameter['since_date'] = convertDateToFullDateStringFormat(since_date);
+            }
+            localVarUrlObj.query = Object.assign({}, localVarUrlObj.query, localVarQueryParameter, options.query);
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            localVarRequestOptions.headers = Object.assign({}, localVarHeaderParameter, options.headers);
+            return {
+                url: __WEBPACK_IMPORTED_MODULE_0_url__["format"](localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Updates a transaction
          * @summary Updates an existing transaction
          * @param {string} budget_id - The ID of the Budget.
@@ -2709,6 +2793,30 @@ const TransactionsApiFp = function (configuration) {
             };
         },
         /**
+         * Returns all transactions for a specified payee
+         * @summary List payee transactions
+         * @param {string} budget_id - The ID of the Budget.
+         * @param {string} payee_id - The ID of the Payee.
+         * @param {Date} [since_date] - Only return transactions on or after this date.
+         * @param {*} [options] - Override http request options.
+         * @throws {RequiredError}
+         */
+        getTransactionsByPayee(budget_id, payee_id, since_date, options) {
+            const localVarFetchArgs = TransactionsApiFetchParamCreator(configuration).getTransactionsByPayee(budget_id, payee_id, since_date, options);
+            return (fetchFunction = fetch) => {
+                return fetchFunction(configuration.basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json();
+                    }
+                    else {
+                        return response.json().then((e) => {
+                            return Promise.reject(e);
+                        });
+                    }
+                });
+            };
+        },
+        /**
          * Updates a transaction
          * @summary Updates an existing transaction
          * @param {string} budget_id - The ID of the Budget.
@@ -2812,6 +2920,18 @@ const TransactionsApiFactory = function (configuration) {
             return TransactionsApiFp(configuration).getTransactionsById(budget_id, transaction_id, options)();
         },
         /**
+         * Returns all transactions for a specified payee
+         * @summary List payee transactions
+         * @param {string} budget_id - The ID of the Budget.
+         * @param {string} payee_id - The ID of the Payee.
+         * @param {Date} [since_date] - Only return transactions on or after this date.
+         * @param {*} [options] - Override http request options.
+         * @throws {RequiredError}
+         */
+        getTransactionsByPayee(budget_id, payee_id, since_date, options) {
+            return TransactionsApiFp(configuration).getTransactionsByPayee(budget_id, payee_id, since_date, options)();
+        },
+        /**
          * Updates a transaction
          * @summary Updates an existing transaction
          * @param {string} budget_id - The ID of the Budget.
@@ -2908,6 +3028,19 @@ class TransactionsApi extends BaseAPI {
      */
     getTransactionsById(budget_id, transaction_id, options) {
         return TransactionsApiFp(this.configuration).getTransactionsById(budget_id, transaction_id, options)();
+    }
+    /**
+     * Returns all transactions for a specified payee
+     * @summary List payee transactions
+     * @param {string} budget_id - The ID of the Budget.
+     * @param {string} payee_id - The ID of the Payee.
+     * @param {Date} [since_date] - Only return transactions on or after this date.
+     * @param {*} [options] - Override http request options.
+     * @throws {RequiredError}
+     * @memberof TransactionsApi
+     */
+    getTransactionsByPayee(budget_id, payee_id, since_date, options) {
+        return TransactionsApiFp(this.configuration).getTransactionsByPayee(budget_id, payee_id, since_date, options)();
     }
     /**
      * Updates a transaction
@@ -3062,7 +3195,178 @@ class UserApi extends BaseAPI {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(2);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  props: ['categories', 'budgetId', 'api'],
+  data () {
+    return {
+      selectedCategory: this.categories[0],
+      transactions: [],
+      idealBurndown: ['ideal', 30, 200, 100, 400, 150, 250],
+      actualBurndown: ['actual', 50, 20, 10, 40],
+      idealX: ['idealX', 1, 2, 3, 4, 5, 6],
+      actualX: ['actualX', 1,2, 3, 4]
+    }
+  },
+  methods: {
+    selectCategory(category) {
+      //TODO generate idealBurndown
+      //TODO get actual burndown
+      //TODO populate x and y axis
+      this.getTransactionsForSelectedCategory()
+    },
+    refreshChartData(category, transactions, startDate, endDate) {
+      this.idealBurndown = ['ideal'];
+      this.idealX = ['idealX'];
+      this.actualBurndown = ['actual'];
+      this.actualX = ['actualX'];
+      var startingBalance = category.balance - category.activity
+      this.buildActualBurndownData(startingBalance, transactions, startDate, new Date());
+      this.buildIdealBurndownData(startingBalance, startDate, endDate);
+      this.buildChart();
+    },
+    getTransactionsForSelectedCategory() {
+      this.loading = true;
+      this.error = null;
+      this.transactions = [];
+      this.api.transactions.getTransactionsByCategory(this.budgetId, this.selectedCategory.id, this.getFirstDayOfMonth()).then((res) => {
+        // this.transactions = res.data.transactions;
+        this.refreshChartData(this.selectedCategory, res.data.transactions, this.getFirstDayOfMonth(), this.getLastDayOfMonth());
+      }).catch((err) => {
+        this.error = err.error.detail;
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
+    getFirstDayOfMonth() {
+      var date = new Date();
+      return new Date(date.getFullYear(), date.getMonth(), 1);
+    },
+    getLastDayOfMonth() {
+      var date = new Date();
+      return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    },
+    dateDiff(first, second) {
+      // Take the difference between the dates and divide by milliseconds per day.
+      // Round to nearest whole number to deal with DST.
+      return Math.round((second-first)/(1000*60*60*24));
+    },
+    addDays(date, days) {
+      var result = new Date(date);
+      result.setDate(result.getDate() + days);
+      return result;
+    },
+    parseDate(dateString) {
+      var parts = dateString.split('-');
+      // Please pay attention to the month (parts[1]); JavaScript counts months from 0:
+      // January - 0, February - 1, etc.
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    },
+    buildActualBurndownData(startingBalance, transactions, startDate, endDate) {
+      var range = this.dateDiff(startDate, endDate)
+      var balance = startingBalance
+      var remainingTransactions = transactions
+      for (var i = 0; i < range; i++) {
+          var dataDate = this.addDays(startDate, i)
+          while (remainingTransactions.length > 0) {
+            var transactionDate = this.parseDate(remainingTransactions[0].date)
+            if (dataDate.getTime() === transactionDate.getTime()) {
+              balance += remainingTransactions[0].amount
+              remainingTransactions.shift()
+            } else {
+              break
+            }
+          }
+
+          this.actualBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance).toFixed(2))
+          this.actualX.push(i + 1)
+      }
+    },
+    buildIdealBurndownData(startingBalance, startDate, endDate) {
+      var range = this.dateDiff(startDate, endDate)
+      var balance = startingBalance
+      var idealDailySpend = startingBalance / range
+      for (var i = 0; i < range; i++) {
+          this.idealBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance).toFixed(2))
+          this.idealX.push(i + 1)
+
+          balance = balance - idealDailySpend
+      }
+    },
+    buildChart() {
+      var chart = c3.generate({
+        data: {
+        xs: {
+            'ideal': 'idealX',
+            'actual': 'actualX',
+        },
+        columns: [
+            this.idealX, this.actualX, this.idealBurndown, this.actualBurndown
+          ]
+        },
+        axis: {
+          x: {
+            label: {
+              text: 'Day of Month',
+              position: 'outer-middle'
+            }
+          },
+          y: {
+            // min: Math.min(this.selectedCategory.balance, 0),
+            padding: {bottom: 0},
+            label: {
+              text: 'Remaining Balance',
+              position: 'outer-middle'
+            },
+            tick: {
+              format: d3.format("$,")
+            }
+          }
+        },
+        legend: {
+          position: 'right'
+        }
+      });
+  },
+  // Now we can make this method available to our template
+  // So we can format this milliunits in the correct currency format
+  convertMilliUnitsToCurrencyAmount: __WEBPACK_IMPORTED_MODULE_0_ynab__["b" /* utils */].convertMilliUnitsToCurrencyAmount
+},
+  // created: function() {
+  //     this.selectCategory(this.selectedCategory);
+  // }
+});
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(2);
 //
 //
 //
@@ -3106,13 +3410,13 @@ class UserApi extends BaseAPI {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__App_vue__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__App_vue__ = __webpack_require__(13);
 
 
 
@@ -3124,7 +3428,7 @@ new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11136,21 +11440,24 @@ if (inBrowser) {
 
 /* harmony default export */ __webpack_exports__["a"] = (Vue);
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1), __webpack_require__(9).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1), __webpack_require__(10).setImmediate))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
+/* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
+            (typeof self !== "undefined" && self) ||
+            window;
+var apply = Function.prototype.apply;
 
 // DOM APIs, for completeness
 
 exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+  return new Timeout(apply.call(setTimeout, scope, arguments), clearTimeout);
 };
 exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+  return new Timeout(apply.call(setInterval, scope, arguments), clearInterval);
 };
 exports.clearTimeout =
 exports.clearInterval = function(timeout) {
@@ -11165,7 +11472,7 @@ function Timeout(id, clearFn) {
 }
 Timeout.prototype.unref = Timeout.prototype.ref = function() {};
 Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
+  this._clearFn.call(scope, this._id);
 };
 
 // Does not start the time, just sets up the members needed.
@@ -11192,8 +11499,8 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(10);
-// On some exotic environments, it's not clear which object `setimmeidate` was
+__webpack_require__(11);
+// On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
 exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
@@ -11206,7 +11513,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -11396,10 +11703,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(11)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(12)))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -11589,15 +11896,14 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(3);
 /* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7ba5bd90_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_3ce1137c_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(36);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
-var disposed = false
 /* script */
 
 
@@ -11614,36 +11920,19 @@ var __vue_module_identifier__ = null
 
 var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
   __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7ba5bd90_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7ba5bd90_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["b" /* staticRenderFns */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_3ce1137c_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_3ce1137c_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["b" /* staticRenderFns */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/App.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-7ba5bd90", Component.options)
-  } else {
-    hotAPI.reload("data-v-7ba5bd90", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
 
 /* harmony default export */ __webpack_exports__["a"] = (Component.exports);
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11670,7 +11959,7 @@ class Configuration {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11697,8 +11986,8 @@ class Configuration {
 
 
 
-var punycode = __webpack_require__(15);
-var util = __webpack_require__(17);
+var punycode = __webpack_require__(16);
+var util = __webpack_require__(18);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -11773,7 +12062,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'gopher:': true,
       'file:': true
     },
-    querystring = __webpack_require__(18);
+    querystring = __webpack_require__(19);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -12409,7 +12698,7 @@ Url.prototype.parseHost = function() {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.1 by @mathias */
@@ -12945,10 +13234,10 @@ Url.prototype.parseHost = function() {
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)(module), __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)(module), __webpack_require__(1)))
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -12976,7 +13265,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12999,18 +13288,18 @@ module.exports = {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.decode = exports.parse = __webpack_require__(19);
-exports.encode = exports.stringify = __webpack_require__(20);
+exports.decode = exports.parse = __webpack_require__(20);
+exports.encode = exports.stringify = __webpack_require__(21);
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13101,7 +13390,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13193,19 +13482,19 @@ var objectKeys = Object.keys || function (obj) {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // the whatwg-fetch polyfill installs the fetch() function
 // on the global object (window or self)
 //
 // Return that as the export for use in Webpack, Browserify etc.
-__webpack_require__(22);
+__webpack_require__(23);
 module.exports = self.fetch.bind(self);
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
 (function(self) {
@@ -13568,7 +13857,10 @@ module.exports = self.fetch.bind(self);
 
   function parseHeaders(rawHeaders) {
     var headers = new Headers()
-    rawHeaders.split(/\r?\n/).forEach(function(line) {
+    // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
+    // https://tools.ietf.org/html/rfc7230#section-3.2
+    var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, ' ')
+    preProcessedHeaders.split(/\r?\n/).forEach(function(line) {
       var parts = line.split(':')
       var key = parts.shift().trim()
       if (key) {
@@ -13587,7 +13879,7 @@ module.exports = self.fetch.bind(self);
     }
 
     this.type = 'default'
-    this.status = 'status' in options ? options.status : 200
+    this.status = options.status === undefined ? 200 : options.status
     this.ok = this.status >= 200 && this.status < 300
     this.statusText = 'statusText' in options ? options.statusText : 'OK'
     this.headers = new Headers(options.headers)
@@ -13654,6 +13946,8 @@ module.exports = self.fetch.bind(self);
 
       if (request.credentials === 'include') {
         xhr.withCredentials = true
+      } else if (request.credentials === 'omit') {
+        xhr.withCredentials = false
       }
 
       if ('responseType' in xhr && support.blob) {
@@ -13672,7 +13966,7 @@ module.exports = self.fetch.bind(self);
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13714,111 +14008,18 @@ module.exports = self.fetch.bind(self);
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports) {
 
 module.exports = {"clientId":"e5a021da2a19f7c0c93879f37ab0f1b65f61ce8cc9a808793513fb605013edbc","redirectUri":"https://rslayter.github.io/ynab-api-starter-kit/"}
-
-/***/ }),
-/* 25 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_65af85a3_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Nav_vue__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
-var disposed = false
-/* script */
-var __vue_script__ = null
-/* template */
-
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-
-var Component = Object(__WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
-  __vue_script__,
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_65af85a3_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Nav_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_65af85a3_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Nav_vue__["b" /* staticRenderFns */],
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "src/components/Nav.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-65af85a3", Component.options)
-  } else {
-    hotAPI.reload("data-v-65af85a3", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
-
 
 /***/ }),
 /* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      {
-        staticClass:
-          "d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow"
-      },
-      [
-        _c("h5", { staticClass: "my-0 mr-md-auto font-weight-normal" }, [
-          _vm._v("\n    App Name\n  ")
-        ])
-      ]
-    )
-  }
-]
-render._withStripped = true
-
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-65af85a3", { render: render, staticRenderFns: staticRenderFns })
-  }
-}
-
-/***/ }),
-/* 27 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_40ab164b_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_35b4ec82_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Nav_vue__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
-var disposed = false
 /* script */
 var __vue_script__ = null
 /* template */
@@ -13834,32 +14035,26 @@ var __vue_module_identifier__ = null
 
 var Component = Object(__WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
   __vue_script__,
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_40ab164b_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_40ab164b_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__["b" /* staticRenderFns */],
+  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_35b4ec82_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Nav_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_35b4ec82_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Nav_vue__["b" /* staticRenderFns */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/components/Footer.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-40ab164b", Component.options)
-  } else {
-    hotAPI.reload("data-v-40ab164b", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
 
 /* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _vm._m(0)}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow"},[_c('h5',{staticClass:"my-0 mr-md-auto font-weight-normal"},[_vm._v("\n    YNAB Dashboard\n  ")])])}]
 
 
 /***/ }),
@@ -13867,49 +14062,54 @@ if (false) {(function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("footer", { staticClass: "pt-4 my-md-5 pt-md-5 border-top" }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-12 col-md" }, [
-          _c("small", { staticClass: "text-muted" }, [_vm._v("MADE BY")]),
-          _vm._v(" "),
-          _c("h5", [_c("a", { attrs: { href: "#" } }, [_vm._v("You!")])])
-        ])
-      ])
-    ])
-  }
-]
-render._withStripped = true
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5919113e_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
+/* script */
+var __vue_script__ = null
+/* template */
 
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-40ab164b", { render: render, staticRenderFns: staticRenderFns })
-  }
-}
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+
+var Component = Object(__WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
+  __vue_script__,
+  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5919113e_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5919113e_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__["b" /* staticRenderFns */],
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+
+/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+
 
 /***/ }),
 /* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _vm._m(0)}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('footer',{staticClass:"pt-4 my-md-5 pt-md-5 border-top"},[_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-12 col-md"},[_c('small',{staticClass:"text-muted"},[_vm._v("MADE BY")]),_vm._v(" "),_c('h5',[_c('a',{attrs:{"href":"#"}},[_vm._v("Rachel Slayter and Zachary Slayter")])])])])])}]
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_Budgets_vue__ = __webpack_require__(5);
 /* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_c6da5664_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Budgets_vue__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6fc9d3f7_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Budgets_vue__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
-var disposed = false
 /* script */
 
 
@@ -13926,92 +14126,37 @@ var __vue_module_identifier__ = null
 
 var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
   __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_Budgets_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_c6da5664_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Budgets_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_c6da5664_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Budgets_vue__["b" /* staticRenderFns */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6fc9d3f7_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Budgets_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6fc9d3f7_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Budgets_vue__["b" /* staticRenderFns */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/components/Budgets.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-c6da5664", Component.options)
-  } else {
-    hotAPI.reload("data-v-c6da5664", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
 
 /* harmony default export */ __webpack_exports__["a"] = (Component.exports);
 
-
-/***/ }),
-/* 30 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "budgets container" },
-    [
-      _c("h5", [_vm._v("Select A Budget")]),
-      _vm._v(" "),
-      _vm._l(_vm.budgets, function(budget) {
-        return _c("div", { staticClass: "row" }, [
-          _c(
-            "a",
-            {
-              staticClass: "col",
-              attrs: { href: "#" },
-              on: {
-                click: function($event) {
-                  _vm.selectBudget(budget.id, $event)
-                }
-              }
-            },
-            [_vm._v("\n      " + _vm._s(budget.name) + "\n    ")]
-          )
-        ])
-      })
-    ],
-    2
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-c6da5664", { render: render, staticRenderFns: staticRenderFns })
-  }
-}
 
 /***/ }),
 /* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_Transactions_vue__ = __webpack_require__(6);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"budgets container"},[_c('h5',[_vm._v("Select A Budget")]),_vm._v(" "),_vm._l((_vm.budgets),function(budget){return _c('div',{staticClass:"row"},[_c('a',{staticClass:"col",attrs:{"href":"#"},on:{"click":function($event){_vm.selectBudget(budget.id, $event)}}},[_vm._v("\n      "+_vm._s(budget.name)+"\n    ")])])})],2)}
+var staticRenderFns = []
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_CategoryBurndown_vue__ = __webpack_require__(6);
 /* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_77126b05_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Transactions_vue__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4f68c5b9_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
-var disposed = false
 /* script */
 
 
@@ -14027,111 +14172,17 @@ var __vue_scopeId__ = null
 var __vue_module_identifier__ = null
 
 var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_Transactions_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_77126b05_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Transactions_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_77126b05_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Transactions_vue__["b" /* staticRenderFns */],
+  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_CategoryBurndown_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4f68c5b9_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4f68c5b9_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__["b" /* staticRenderFns */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "src/components/CategoryBurndown.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-77126b05", Component.options)
-  } else {
-    hotAPI.reload("data-v-77126b05", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
 
 /* harmony default export */ __webpack_exports__["a"] = (Component.exports);
 
-
-/***/ }),
-/* 32 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container" }, [
-    _c("h5", [_vm._v("Transactions")]),
-    _vm._v(" "),
-    _c("table", { staticClass: "table" }, [
-      _vm._m(0),
-      _vm._v(" "),
-      _c(
-        "tbody",
-        _vm._l(_vm.transactions, function(transaction) {
-          return _c("tr", { key: transaction.id }, [
-            _c("td", [_vm._v(_vm._s(transaction.account_name))]),
-            _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(transaction.date))]),
-            _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(transaction.payee_name))]),
-            _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(transaction.category_name))]),
-            _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(transaction.memo))]),
-            _vm._v(" "),
-            _c("td", [
-              _vm._v(
-                _vm._s(
-                  _vm
-                    .convertMilliUnitsToCurrencyAmount(transaction.amount)
-                    .toFixed(2)
-                )
-              )
-            ])
-          ])
-        })
-      )
-    ])
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("Account")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Date")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Payee")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Category")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Memo")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Amount")])
-      ])
-    ])
-  }
-]
-render._withStripped = true
-
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-77126b05", { render: render, staticRenderFns: staticRenderFns })
-  }
-}
 
 /***/ }),
 /* 33 */
@@ -14140,172 +14191,67 @@ if (false) {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { attrs: { id: "app" } },
-    [
-      _c("Nav"),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "container" },
-        [
-          _vm.loading
-            ? _c("h1", { staticClass: "display-4" }, [_vm._v("Loading...")])
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.error
-            ? _c("div", [
-                _c("h1", { staticClass: "display-4" }, [_vm._v("Oops!")]),
-                _vm._v(" "),
-                _c("p", { staticClass: "lead" }, [_vm._v(_vm._s(_vm.error))]),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary",
-                    on: { click: _vm.resetToken }
-                  },
-                  [_vm._v("Try Again >")]
-                )
-              ])
-            : _c(
-                "div",
-                [
-                  !_vm.ynab.token
-                    ? _c("form", [
-                        _c("h1", { staticClass: "display-4" }, [
-                          _vm._v("Congrats!")
-                        ]),
-                        _vm._v(" "),
-                        _c("p", { staticClass: "lead" }, [
-                          _vm._v(
-                            "You have successfully started a new YNAB API Application!"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm._m(0),
-                        _vm._v(" "),
-                        _vm._m(1),
-                        _vm._v(" "),
-                        _c("p", [_vm._v(" ")]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "form-group" }, [
-                          _c("h1", { staticClass: "display-5" }, [
-                            _vm._v("Hello!")
-                          ]),
-                          _vm._v(" "),
-                          _c("p", { staticClass: "lead" }, [
-                            _vm._v(
-                              "If you would like to use this App, please authorize with YNAB!"
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c(
-                            "button",
-                            {
-                              staticClass: "btn btn-primary",
-                              on: { click: _vm.authorizeWithYNAB }
-                            },
-                            [_vm._v("Authorize This App With YNAB >")]
-                          )
-                        ])
-                      ])
-                    : !_vm.budgetId
-                      ? _c("Budgets", {
-                          attrs: {
-                            budgets: _vm.budgets,
-                            selectBudget: _vm.selectBudget
-                          }
-                        })
-                      : _c(
-                          "div",
-                          [
-                            _c("Transactions", {
-                              attrs: { transactions: _vm.transactions }
-                            }),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-info",
-                                on: {
-                                  click: function($event) {
-                                    _vm.budgetId = null
-                                  }
-                                }
-                              },
-                              [_vm._v("< Select Another Budget")]
-                            )
-                          ],
-                          1
-                        )
-                ],
-                1
-              ),
-          _vm._v(" "),
-          _c("Footer")
-        ],
-        1
-      )
-    ],
-    1
-  )
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("ul", [
-      _c("li", [
-        _vm._v("Please go to your "),
-        _c(
-          "a",
-          {
-            attrs: {
-              href: "https://app.youneedabudget.com/settings/developer",
-              target: "_blank",
-              rel: "noopener noreferrer"
-            }
-          },
-          [_vm._v("YNAB Developer Settings")]
-        ),
-        _vm._v(" and create a new OAuth Application.")
-      ]),
-      _vm._v(" "),
-      _c("li", [
-        _vm._v("Copy your client ID and redirect URI into "),
-        _c("em", [_vm._v("src/config.json")]),
-        _vm._v(".")
-      ]),
-      _vm._v(" "),
-      _c("li", [_vm._v("Then build your amazing app!")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("p", [
-      _vm._v("If you have any questions please reach out to us at "),
-      _c("strong", [_vm._v("api@youneedabudget.com")]),
-      _vm._v(".")
-    ])
-  }
-]
-render._withStripped = true
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"categoryBurndown container"},[_c('h5',[_vm._v("Select A Category")]),_vm._v(" "),_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-xs-4"},[_c('select',{directives:[{name:"model",rawName:"v-model",value:(_vm.selectedCategory),expression:"selectedCategory"}],staticClass:"form-control",on:{"change":[function($event){var $$selectedVal = Array.prototype.filter.call($event.target.options,function(o){return o.selected}).map(function(o){var val = "_value" in o ? o._value : o.value;return val}); _vm.selectedCategory=$event.target.multiple ? $$selectedVal : $$selectedVal[0]},function($event){_vm.selectCategory(_vm.selectedCategory)}]}},_vm._l((_vm.categories),function(category){return _c('option',{domProps:{"value":category}},[_vm._v("\n          "+_vm._s(category.name)+"\n        ")])}))])]),_vm._v(" "),(_vm.selectedCategory != '')?_c('div',{staticClass:"row"},[_vm._m(0)]):_vm._e()])}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"col-xs-4"},[_c('div',{attrs:{"id":"chart"}})])}]
 
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-7ba5bd90", { render: render, staticRenderFns: staticRenderFns })
-  }
-}
+
+/***/ }),
+/* 34 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_RecentTransactions_vue__ = __webpack_require__(7);
+/* unused harmony namespace reexport */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f516f1a6_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_RecentTransactions_vue__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
+/* script */
+
+
+/* template */
+
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+
+var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
+  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_RecentTransactions_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f516f1a6_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_RecentTransactions_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f516f1a6_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_RecentTransactions_vue__["b" /* staticRenderFns */],
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+
+/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"module"},[_c('h5',[_vm._v("Recent Transactions")]),_vm._v(" "),_c('table',{staticClass:"table"},[_vm._m(0),_vm._v(" "),_c('tbody',_vm._l((_vm.transactions),function(transaction){return _c('tr',{key:transaction.id},[_c('td',[_vm._v(_vm._s(transaction.account_name))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(transaction.date))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(transaction.payee_name))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(transaction.category_name))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(transaction.memo))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(_vm.convertMilliUnitsToCurrencyAmount(transaction.amount).toFixed(2)))])])}))])])}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('thead',[_c('tr',[_c('th',[_vm._v("Account")]),_vm._v(" "),_c('th',[_vm._v("Date")]),_vm._v(" "),_c('th',[_vm._v("Payee")]),_vm._v(" "),_c('th',[_vm._v("Category")]),_vm._v(" "),_c('th',[_vm._v("Memo")]),_vm._v(" "),_c('th',[_vm._v("Amount")])])])}]
+
+
+/***/ }),
+/* 36 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{attrs:{"id":"app"}},[_c('Nav'),_vm._v(" "),_c('div',{staticClass:"container"},[(_vm.loading)?_c('h1',{staticClass:"display-4"},[_vm._v("Loading...")]):_c('div',[(_vm.error)?_c('div',[_c('h1',{staticClass:"display-4"},[_vm._v("Oops!")]),_vm._v(" "),_c('p',{staticClass:"lead"},[_vm._v(_vm._s(_vm.error))]),_vm._v(" "),_c('button',{staticClass:"btn btn-primary",on:{"click":_vm.resetToken}},[_vm._v("Try Again >")])]):_c('div',[(!_vm.ynab.token)?_c('form',[_c('div',{staticClass:"form-group"},[_c('h1',{staticClass:"display-5"},[_vm._v("Hello!")]),_vm._v(" "),_c('p',{staticClass:"lead"},[_vm._v("If you would like to use this App, please authorize with YNAB!")]),_vm._v(" "),_c('button',{staticClass:"btn btn-primary",on:{"click":_vm.authorizeWithYNAB}},[_vm._v("Authorize This App With YNAB >")])])]):(!_vm.budgetId)?_c('Budgets',{attrs:{"budgets":_vm.budgets,"selectBudget":_vm.selectBudget}}):_c('div',[_c('CategoryBurndown',{attrs:{"budgetId":_vm.budgetId,"categories":_vm.categories,"api":_vm.api}}),_vm._v(" "),_c('button',{staticClass:"btn btn-info",on:{"click":function($event){_vm.budgetId = null}}},[_vm._v("< Select Another Budget")])],1)],1)]),_vm._v(" "),_c('Footer')],1)],1)}
+var staticRenderFns = []
+
 
 /***/ })
 /******/ ]);
