@@ -1,6 +1,6 @@
 {
-    "name": "YNAB API Starter Kit",
-    "description": "To quickly get started building an App with the YNAB API",
-    "repository": "https://github.com/ynab/ynab-api-starter-kit",
+    "name": "YNAB Dashboard",
+    "description": "A simple web app to show a dashboard of the most important details of your budget, all in one place.",
+    "repository": "https://github.com/rslayter/ynab-api-starter-kit,
     "keywords": ["ynab"]
 }

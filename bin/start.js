@@ -6,8 +6,8 @@ const cpr = require('cpr');
 const chalk = require('chalk');
 const spawn = require('child_process').spawn;
 
-process.title = 'ynab-api-starter-kit';
-const TO = path.resolve(process.cwd(), process.argv[2] || 'ynab-api-starter-kit');
+process.title = 'ynab-dashboard';
+const TO = path.resolve(process.cwd(), process.argv[2] || 'ynab-dashboard');
 const FROM = path.resolve(__dirname, '..');
 
 const files = [
@@ -20,7 +20,7 @@ const files = [
 
 // Main
 
-console.log(chalk.green('## YNAB API Starter Kit ##'));
+console.log(chalk.green('## YNAB Dashboard ##'));
 copyFiles(function () {
   installDeps(function () {
     startServer()

@@ -1,17 +1,19 @@
 {
-  "name": "ynab-api-starter-kit",
+  "name": "ynab-dashboard",
   "version": "1.0.0",
-  "description": "To quickly get started building an App with the YNAB API.",
+  "description": "A simple web app to show a dashboard of the most important details of your budget, all in one place.",
   "bin": "bin/start.js",
   "scripts": {
     "start": "webpack-dev-server --open --hot",
     "build": "NODE_ENV='production' webpack --progress --hide-modules"
   },
-  "author": "You Need a Budget, LLC",
+  "author": "Rachel Slayter",
   "license": "Apache-2.0",
   "dependencies": {
+    "c3": "^0.6.6",
     "chalk": "^2.3.2",
     "cpr": "^3.0.1",
+    "d3": "^5.5.0",
     "vue": "2.5.15",
     "vue-server-renderer": "2.5.15",
     "xhr": "^2.4.1",
