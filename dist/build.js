@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -204,9 +204,176 @@ module.exports = g;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__configuration__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_json__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__config_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_Nav_vue__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_Footer_vue__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Budgets_vue__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_CategoryBurndown_vue__ = __webpack_require__(31);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  data () {
+    return {
+      ynab: {
+        clientId: __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.clientId,
+        redirectUri: __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.redirectUri,
+        token: null,
+        api: null,
+      },
+      loading: false,
+      error: null,
+      budgetId: null,
+      budgets: [],
+      transactions: [],
+      categories: [],
+    }
+  },
+  // When this component is created, check whether we need to get a token,
+  // budgets or display the transactions
+  created() {
+    this.ynab.token = this.findYNABToken();
+    if (this.ynab.token) {
+      this.api = new __WEBPACK_IMPORTED_MODULE_0_ynab__["a" /* api */](this.ynab.token);
+      if (!this.budgetId) {
+        this.getBudgets();
+      } else {
+        this.selectBudget(this.budgetId);
+      }
+    }
+  },
+  methods: {
+    // This uses the YNAB API to get a list of budgets
+    getBudgets() {
+      this.loading = true;
+      this.error = null;
+      this.api.budgets.getBudgets().then((res) => {
+        this.budgets = res.data.budgets;
+      }).catch((err) => {
+        this.error = err.error.detail;
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
+    // This selects a budget and gets all the categories and transactions in that budget
+    selectBudget(id) {
+      this.loading = true;
+      this.error = null;
+      this.budgetId = id;
+      this.transactions = [];
+      this.api.transactions.getTransactions(id).then((res) => {
+        this.transactions = res.data.transactions;
+      }).catch((err) => {
+        this.error = err.error.detail;
+      }).finally(() => {
+        this.loading = false;
+      });
+
+      this.api.categories.getCategories(id).then((res) => {
+        this.categories = res.data.category_groups
+        .filter(category => {
+          return category.name != "Internal Master Category" && category.name != "Credit Card Payments" && category.name != "Hidden Categories"
+        })
+        .reduce((categoryAcc, category_group) => {
+          return categoryAcc.concat(category_group.categories);
+        }, []);
+      }).catch((err) => {
+        this.error = err.error.detail;
+      }).finally(() => {
+        this.loading = false;
+      });
+
+    },
+    // This builds a URI to get an access token from YNAB
+    // https://api.youneedabudget.com/#outh-applications
+    authorizeWithYNAB(e) {
+      e.preventDefault();
+      const uri = `https://app.youneedabudget.com/oauth/authorize?client_id=${this.ynab.clientId}&redirect_uri=${this.ynab.redirectUri}&response_type=token`;
+      location.replace(uri);
+    },
+    // Method to find a YNAB token
+    // First it looks in the location.hash and then sessionStorage
+    findYNABToken() {
+      let token = null;
+      const search = window.location.hash.substring(1).replace(/&/g, '","').replace(/=/g,'":"');
+      if (search && search !== '') {
+        // Try to get access_token from the hash returned by OAuth
+        const params = JSON.parse('{"' + search + '"}', function(key, value) {
+          return key === '' ? value : decodeURIComponent(value);
+        });
+        token = params.access_token;
+        sessionStorage.setItem('ynab_access_token', token);
+        window.location.hash = '';
+      } else {
+        // Otherwise try sessionStorage
+        token = sessionStorage.getItem('ynab_access_token');
+      }
+      return token;
+    },
+    // Clear the token and start authorization over
+    resetToken() {
+      sessionStorage.removeItem('ynab_access_token');
+      this.ynab.token = null;
+      this.error = null;
+    }
+  },
+  // Specify which components we want to make available to our templates
+  components: {
+    Nav: __WEBPACK_IMPORTED_MODULE_2__components_Nav_vue__["a" /* default */],
+    Footer: __WEBPACK_IMPORTED_MODULE_3__components_Footer_vue__["a" /* default */],
+    Budgets: __WEBPACK_IMPORTED_MODULE_4__components_Budgets_vue__["a" /* default */],
+    CategoryBurndown: __WEBPACK_IMPORTED_MODULE_5__components_CategoryBurndown_vue__["a" /* default */]
+  }
+});
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__configuration__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(23);
 /* unused harmony namespace reexport */
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_2__utils__["a"]; });
 
@@ -304,184 +471,6 @@ class api {
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_json__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__config_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_Nav_vue__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_Footer_vue__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_Budgets_vue__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__components_CategoryBurndown_vue__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__components_RecentTransactions_vue__ = __webpack_require__(34);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-
-
-
-
-
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-  data () {
-    return {
-      ynab: {
-        clientId: __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.clientId,
-        redirectUri: __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.redirectUri,
-        token: null,
-        api: null,
-      },
-      loading: false,
-      error: null,
-      budgetId: null,
-      budgets: [],
-      transactions: [],
-      categories: [],
-      recentTransactions: [],
-      recentCategories: []
-    }
-  },
-  // When this component is created, check whether we need to get a token,
-  // budgets or display the transactions
-  created() {
-    this.ynab.token = __WEBPACK_IMPORTED_MODULE_1__config_json___default.a.token;
-    if (this.ynab.token) {
-      this.api = new __WEBPACK_IMPORTED_MODULE_0_ynab__["a" /* api */](this.ynab.token);
-      if (!this.budgetId) {
-        this.getBudgets();
-      } else {
-        this.selectBudget(this.budgetId);
-      }
-    }
-  },
-  methods: {
-    // This uses the YNAB API to get a list of budgets
-    getBudgets() {
-      this.loading = true;
-      this.error = null;
-      this.api.budgets.getBudgets().then((res) => {
-        this.budgets = res.data.budgets;
-      }).catch((err) => {
-        this.error = err.error.detail;
-      }).finally(() => {
-        this.loading = false;
-      });
-    },
-    // This selects a budget and gets all the categories and transactions in that budget
-    selectBudget(id) {
-      this.loading = true;
-      this.error = null;
-      this.budgetId = id;
-      this.transactions = [];
-      this.api.transactions.getTransactions(id).then((res) => {
-        this.transactions = res.data.transactions;
-        this.parseTransactions();
-      }).catch((err) => {
-        this.error = err.error.detail;
-      }).finally(() => {
-        this.loading = false;
-      });
-
-      this.api.categories.getCategories(id).then((res) => {
-        this.categories = res.data.category_groups
-        .filter(category => {
-          return category.name != "Internal Master Category" && category.name != "Credit Card Payments" && category.name != "Hidden Categories"
-        })
-        .reduce((categoryAcc, category_group) => {
-          return categoryAcc.concat(category_group.categories);
-        }, []);
-      }).catch((err) => {
-        this.error = err.error.detail;
-      }).finally(() => {
-        this.loading = false;
-      });
-
-    },
-    // This builds a URI to get an access token from YNAB
-    // https://api.youneedabudget.com/#outh-applications
-    authorizeWithYNAB(e) {
-      e.preventDefault();
-      const uri = `https://app.youneedabudget.com/oauth/authorize?client_id=${this.ynab.clientId}&redirect_uri=${this.ynab.redirectUri}&response_type=token`;
-      location.replace(uri);
-    },
-    // Method to find a YNAB token
-    // First it looks in the location.hash and then sessionStorage
-    findYNABToken() {
-      let token = null;
-      const search = window.location.hash.substring(1).replace(/&/g, '","').replace(/=/g,'":"');
-      if (search && search !== '') {
-        // Try to get access_token from the hash returned by OAuth
-        const params = JSON.parse('{"' + search + '"}', function(key, value) {
-          return key === '' ? value : decodeURIComponent(value);
-        });
-        token = params.access_token;
-        sessionStorage.setItem('ynab_access_token', token);
-        window.location.hash = '';
-      } else {
-        // Otherwise try sessionStorage
-        token = sessionStorage.getItem('ynab_access_token');
-      }
-      return token;
-    },
-    // Clear the token and start authorization over
-    resetToken() {
-      sessionStorage.removeItem('ynab_access_token');
-      this.ynab.token = null;
-      this.error = null;
-    },
-    //parse transaction data to provide new data models
-    parseTransactions() {
-      this.recentTransactions = this.transactions.slice(Math.max(this.transactions.length - 10, 0)).reverse();
-    }
-  },
-  // Specify which components we want to make available to our templates
-  components: {
-    Nav: __WEBPACK_IMPORTED_MODULE_2__components_Nav_vue__["a" /* default */],
-    Footer: __WEBPACK_IMPORTED_MODULE_3__components_Footer_vue__["a" /* default */],
-    Budgets: __WEBPACK_IMPORTED_MODULE_4__components_Budgets_vue__["a" /* default */],
-    RecentTransactions: __WEBPACK_IMPORTED_MODULE_6__components_RecentTransactions_vue__["a" /* default */],
-    CategoryBurndown: __WEBPACK_IMPORTED_MODULE_5__components_CategoryBurndown_vue__["a" /* default */]
-  }
-});
-
-
-/***/ }),
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -493,7 +482,7 @@ class api {
 /* unused harmony export HybridTransaction */
 /* unused harmony export ScheduledTransactionDetail */
 /* unused harmony export TransactionDetail */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_url__);
 // tslint:disable
 /**
@@ -510,7 +499,7 @@ class api {
 
 // Requiring portable-fetch like this ensures that we have a global fetch function
 // That makes it easier to override with modules like fetch-mock
-__webpack_require__(22);
+__webpack_require__(21);
 const USER_AGENT = "api_client/js/0.14.0";
 function convertDateToFullDateStringFormat(date) {
     // Convert to RFC 3339 "full-date" format, like "2017-11-27"
@@ -3195,7 +3184,7 @@ class UserApi extends BaseAPI {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(3);
 //
 //
 //
@@ -3366,57 +3355,9 @@ class UserApi extends BaseAPI {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ynab__ = __webpack_require__(2);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-// Import utils from YNAB
-
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-  props: ['transactions'],
-  methods: {
-    // Now we can make this method available to our template
-    // So we can format this milliunits in the correct currency format
-    convertMilliUnitsToCurrencyAmount: __WEBPACK_IMPORTED_MODULE_0_ynab__["b" /* utils */].convertMilliUnitsToCurrencyAmount
-  }
-});
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__App_vue__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__App_vue__ = __webpack_require__(12);
 
 
 
@@ -3428,7 +3369,7 @@ new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11440,10 +11381,10 @@ if (inBrowser) {
 
 /* harmony default export */ __webpack_exports__["a"] = (Vue);
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1), __webpack_require__(10).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1), __webpack_require__(9).setImmediate))
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -11499,7 +11440,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(11);
+__webpack_require__(10);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -11513,7 +11454,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -11703,10 +11644,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(11)))
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -11896,13 +11837,13 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(2);
 /* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_3ce1137c_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_360d9696_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
 /* script */
 
@@ -11920,8 +11861,8 @@ var __vue_module_identifier__ = null
 
 var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
   __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_3ce1137c_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_3ce1137c_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["b" /* staticRenderFns */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_360d9696_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_360d9696_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["b" /* staticRenderFns */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
@@ -11932,7 +11873,7 @@ var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11959,7 +11900,7 @@ class Configuration {
 
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11986,8 +11927,8 @@ class Configuration {
 
 
 
-var punycode = __webpack_require__(16);
-var util = __webpack_require__(18);
+var punycode = __webpack_require__(15);
+var util = __webpack_require__(17);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -12062,7 +12003,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'gopher:': true,
       'file:': true
     },
-    querystring = __webpack_require__(19);
+    querystring = __webpack_require__(18);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -12698,7 +12639,7 @@ Url.prototype.parseHost = function() {
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.1 by @mathias */
@@ -13234,10 +13175,10 @@ Url.prototype.parseHost = function() {
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)(module), __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)(module), __webpack_require__(1)))
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -13265,7 +13206,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13288,18 +13229,18 @@ module.exports = {
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.decode = exports.parse = __webpack_require__(20);
-exports.encode = exports.stringify = __webpack_require__(21);
+exports.decode = exports.parse = __webpack_require__(19);
+exports.encode = exports.stringify = __webpack_require__(20);
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13390,7 +13331,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13482,19 +13423,19 @@ var objectKeys = Object.keys || function (obj) {
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // the whatwg-fetch polyfill installs the fetch() function
 // on the global object (window or self)
 //
 // Return that as the export for use in Webpack, Browserify etc.
-__webpack_require__(23);
+__webpack_require__(22);
 module.exports = self.fetch.bind(self);
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports) {
 
 (function(self) {
@@ -13966,7 +13907,7 @@ module.exports = self.fetch.bind(self);
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14008,17 +13949,17 @@ module.exports = self.fetch.bind(self);
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = {"clientId":"e5a021da2a19f7c0c93879f37ab0f1b65f61ce8cc9a808793513fb605013edbc","redirectUri":"https://rslayter.github.io/ynab-api-starter-kit/"}
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_35b4ec82_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Nav_vue__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_35b4ec82_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Nav_vue__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
 /* script */
 var __vue_script__ = null
@@ -14047,7 +13988,7 @@ var Component = Object(__WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14058,11 +13999,11 @@ var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5919113e_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5919113e_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
 /* script */
 var __vue_script__ = null
@@ -14091,7 +14032,7 @@ var Component = Object(__WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14102,13 +14043,13 @@ var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_Budgets_vue__ = __webpack_require__(5);
 /* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6fc9d3f7_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Budgets_vue__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6fc9d3f7_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Budgets_vue__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
 /* script */
 
@@ -14138,7 +14079,7 @@ var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14149,13 +14090,13 @@ var staticRenderFns = []
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_CategoryBurndown_vue__ = __webpack_require__(6);
 /* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4f68c5b9_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_4f68c5b9_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
 /* script */
 
@@ -14185,7 +14126,7 @@ var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14196,54 +14137,7 @@ var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _
 
 
 /***/ }),
-/* 34 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_RecentTransactions_vue__ = __webpack_require__(7);
-/* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f516f1a6_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_RecentTransactions_vue__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
-/* script */
-
-
-/* template */
-
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-
-var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_RecentTransactions_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f516f1a6_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_RecentTransactions_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f516f1a6_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_RecentTransactions_vue__["b" /* staticRenderFns */],
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
-
-
-/***/ }),
-/* 35 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"module"},[_c('h5',[_vm._v("Recent Transactions")]),_vm._v(" "),_c('table',{staticClass:"table"},[_vm._m(0),_vm._v(" "),_c('tbody',_vm._l((_vm.transactions),function(transaction){return _c('tr',{key:transaction.id},[_c('td',[_vm._v(_vm._s(transaction.account_name))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(transaction.date))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(transaction.payee_name))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(transaction.category_name))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(transaction.memo))]),_vm._v(" "),_c('td',[_vm._v(_vm._s(_vm.convertMilliUnitsToCurrencyAmount(transaction.amount).toFixed(2)))])])}))])])}
-var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('thead',[_c('tr',[_c('th',[_vm._v("Account")]),_vm._v(" "),_c('th',[_vm._v("Date")]),_vm._v(" "),_c('th',[_vm._v("Payee")]),_vm._v(" "),_c('th',[_vm._v("Category")]),_vm._v(" "),_c('th',[_vm._v("Memo")]),_vm._v(" "),_c('th',[_vm._v("Amount")])])])}]
-
-
-/***/ }),
-/* 36 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
