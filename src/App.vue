@@ -19,9 +19,11 @@
           </form>
           <Budgets v-else-if="!budgetId" :budgets="budgets" :selectBudget="selectBudget" />
           <div v-else>
-            <!-- Show the Dashboard for the selected budget -->
+            <!-- Show the burndown chart for the selected budget -->
             <CategoryBurndown :budgetId="budgetId" :categories="categories" :api="api"/>
-            <button class="btn btn-info" @click="budgetId = null">&lt; Select Another Budget</button>
+            <div class="row">
+              <button class="btn btn-info back-button" @click="budgetId = null">&lt; Select Another Budget</button>
+            </div>
           </div>
         </div>
       </div>
@@ -37,6 +39,7 @@ import Nav from './components/Nav.vue';
 import Footer from './components/Footer.vue';
 import Budgets from './components/Budgets.vue';
 import CategoryBurndown from './components/CategoryBurndown.vue';
+import Transactions from './components/Transactions.vue';
 
 export default {
   data () {
@@ -52,7 +55,7 @@ export default {
       budgetId: null,
       budgets: [],
       transactions: [],
-      categories: [],
+      categories: []
     }
   },
   // When this component is created, check whether we need to get a token,
@@ -86,15 +89,7 @@ export default {
       this.loading = true;
       this.error = null;
       this.budgetId = id;
-      this.transactions = [];
-      this.api.transactions.getTransactions(id).then((res) => {
-        this.transactions = res.data.transactions;
-      }).catch((err) => {
-        this.error = err.error.detail;
-      }).finally(() => {
-        this.loading = false;
-      });
-
+      this.categories = [];
       this.api.categories.getCategories(id).then((res) => {
         this.categories = res.data.category_groups
         .filter(category => {
@@ -148,7 +143,8 @@ export default {
     Nav,
     Footer,
     Budgets,
-    CategoryBurndown
+    CategoryBurndown,
+    Transactions
   }
 }
 </script>

@@ -1,34 +1,42 @@
 <template>
-  <div class="categoryBurndown container">
-    <h5>Select A Category</h5>
+  <div class="categoryBurndown">
     <div class="row">
+      <h1>Category Burndown Chart</h1>
+    </div>
+    <div id="selectCategoryDropdown" class="row">
       <div class="col-xs-4">
         <select class="form-control" v-model="selectedCategory" v-on:change="selectCategory(selectedCategory)">
+          <option value="" disabled selected>Choose a category</option>
           <option v-for="category in categories" :value="category">
             {{category.name}}
           </option>
         </select>
       </div>
     </div>
+    <div class="row">
+        Track how much you have left in your budget for a category in a month and how quickly you are spending it. This helps you gauge if you are on track to meet your budget goals or if you should slow down your spending in a category. 
+    </div>
     <div class="row" v-if="selectedCategory != ''">
       <div class="col-xs-4">
           <div id="chart"></div>
       </div>
+      <Transactions :transactions="transactions" />
     </div>
   </div>
 </template>
 
 <script>
 import {utils} from 'ynab';
+import Transactions from './Transactions.vue';
 
 export default {
   props: ['categories', 'budgetId', 'api'],
   data () {
     return {
-      selectedCategory: this.categories[0],
+      selectedCategory: '',
       transactions: [],
-      idealBurndown: ['ideal', 30, 200, 100, 400, 150, 250],
-      actualBurndown: ['actual', 50, 20, 10, 40],
+      idealBurndown: ['ideal'],
+      actualBurndown: ['actual'],
       idealX: ['idealX', 1, 2, 3, 4, 5, 6],
       actualX: ['actualX', 1,2, 3, 4]
     }
@@ -55,7 +63,7 @@ export default {
       this.error = null;
       this.transactions = [];
       this.api.transactions.getTransactionsByCategory(this.budgetId, this.selectedCategory.id, this.getFirstDayOfMonth()).then((res) => {
-        // this.transactions = res.data.transactions;
+        this.transactions = JSON.parse(JSON.stringify(res.data.transactions)).reverse();
         this.refreshChartData(this.selectedCategory, res.data.transactions, this.getFirstDayOfMonth(), this.getLastDayOfMonth());
       }).catch((err) => {
         this.error = err.error.detail;
@@ -149,7 +157,7 @@ export default {
           }
         },
         legend: {
-          position: 'right'
+          position: 'bottom'
         }
       });
   },
@@ -157,8 +165,9 @@ export default {
   // So we can format this milliunits in the correct currency format
   convertMilliUnitsToCurrencyAmount: utils.convertMilliUnitsToCurrencyAmount
 },
-  // created: function() {
-  //     this.selectCategory(this.selectedCategory);
-  // }
+// Specify which components we want to make available to our templates
+components: {
+  Transactions
+}
 }
 </script>
