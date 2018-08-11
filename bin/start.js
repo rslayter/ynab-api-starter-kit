@@ -20,7 +20,7 @@ const files = [
 
 // Main
 
-console.log(chalk.green('## YNAB Dashboard ##'));
+console.log(chalk.green('## YNAB Burndown ##'));
 copyFiles(function () {
   installDeps(function () {
     startServer()

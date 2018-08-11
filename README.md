@@ -1,4 +1,4 @@
-# YNAB Dashboard
+# YNAB Burndown
 
 A simple web app to show a dashboard of the most important details of your budget, all in one place.
 

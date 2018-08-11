@@ -52,6 +52,7 @@ export default {
       selectedMonthIndex: 0,
       selectedMonth: '',
       selectedCategory: '',
+      startingBalance: 0,
       transactions: [],
       idealBurndown: ['ideal'],
       actualBurndown: ['actual'],
@@ -65,11 +66,24 @@ export default {
       this.idealX = ['idealX'];
       this.actualBurndown = ['actual'];
       this.actualX = ['actualX'];
-      var startingBalance = category.balance - category.activity
+      // var startingBalance = category.balance - category.activity
       var actualEndDate = this.selectedMonthIndex == 0 ? new Date() : endDate
-      this.buildActualBurndownData(startingBalance, transactions, startDate, actualEndDate);
-      this.buildIdealBurndownData(startingBalance, startDate, endDate);
+      this.buildActualBurndownData(this.startingBalance, transactions, startDate, actualEndDate);
+      this.buildIdealBurndownData(this.startingBalance, startDate, endDate);
       this.buildChart();
+    },
+    getStartingBalance(category, startDate, endDate, categoryTransactions) {
+      this.loading = true
+      this.error = null
+      this.api.months.getBudgetMonth(this.budgetId, startDate).then((res) => {
+        var categoryMonth = res.data.month.categories.find(cat => cat.id === category.id);
+        this.startingBalance = categoryMonth.balance - categoryMonth.activity
+        this.refreshChartData(this.selectedCategory, categoryTransactions, startDate, endDate);
+      }).catch((err) => {
+        this.error = err.error.detail;
+      }).finally(() => {
+        this.loading = false;
+      });
     },
     getTransactionsForSelectedCategory() {
       this.loading = true;
@@ -82,7 +96,7 @@ export default {
       this.api.transactions.getTransactionsByCategory(this.budgetId, this.selectedCategory.id, startDate).then((res) => {
         categoryTransactions = this.parseCategoryTransactions(res.data.transactions, endDate);
         this.transactions = JSON.parse(JSON.stringify(categoryTransactions)).reverse(); //immutable list used to display transactions below the chart
-        this.refreshChartData(this.selectedCategory, categoryTransactions, startDate, endDate);
+        this.getStartingBalance(this.selectedCategory, startDate, endDate, categoryTransactions)
       }).catch((err) => {
         this.error = err.error.detail;
       }).finally(() => {
@@ -95,7 +109,7 @@ export default {
     },
     getLastDayOfMonth(index) {
       var date = new Date();
-      return new Date(date.getFullYear(), date.getMonth() + 1 + index, 0);
+      return new Date(date.getFullYear(), date.getMonth() + 1 + index, 0 + 1);
     },
     getDateName(index) {
       const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -153,11 +167,15 @@ export default {
       var range = this.dateDiff(startDate, endDate)
       var balance = startingBalance
       var idealDailySpend = startingBalance / range
+      idealDailySpend += idealDailySpend / range
       for (var i = 0; i < range; i++) {
           this.idealBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance, 2))
           this.idealX.push(i + 1)
 
           balance = balance - idealDailySpend
+          if (i === range - 2) {
+            balance = 0
+          }
       }
     },
     buildChart() {
@@ -217,7 +235,9 @@ export default {
         var parentTransaction = this.allTransactions.find(t => t.id === transaction.parent_transaction_id);
         if (parentTransaction) {
           transaction.payee_name = parentTransaction.payee_name;
-          transaction.category_name = `${transaction.category_name} (Split ${parentTransaction.subtransactions.length} categories)`;
+          transaction.category_name = `${transaction.category_name
+
+          } (Split ${parentTransaction.subtransactions.length} categories)`;
         }
       }
     });
