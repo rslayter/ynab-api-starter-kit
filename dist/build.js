@@ -350,6 +350,8 @@ class api {
 //
 //
 //
+//
+//
 
 
 
@@ -373,7 +375,8 @@ class api {
       budgetId: null,
       budgets: [],
       transactions: [],
-      categories: []
+      categories: [],
+      allTransactions: []
     }
   },
   // When this component is created, check whether we need to get a token,
@@ -422,6 +425,12 @@ class api {
         this.loading = false;
       });
 
+      this.allTransactions = [];
+      this.api.transactions.getTransactions(id).then((res) => {
+        this.allTransactions = res.data.transactions;
+      }).catch((err) => {
+        this.error = err.error.detail;
+      });
     },
     // This builds a URI to get an access token from YNAB
     // https://api.youneedabudget.com/#outh-applications
@@ -3210,14 +3219,32 @@ class UserApi extends BaseAPI {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
 
 /* harmony default export */ __webpack_exports__["a"] = ({
-  props: ['categories', 'budgetId', 'api'],
+  props: ['categories', 'budgetId', 'api', 'allTransactions'],
   data () {
     return {
+      selectedMonthIndex: 0,
+      selectedMonth: '',
       selectedCategory: '',
       transactions: [],
       idealBurndown: ['ideal'],
@@ -3227,19 +3254,14 @@ class UserApi extends BaseAPI {
     }
   },
   methods: {
-    selectCategory(category) {
-      //TODO generate idealBurndown
-      //TODO get actual burndown
-      //TODO populate x and y axis
-      this.getTransactionsForSelectedCategory()
-    },
     refreshChartData(category, transactions, startDate, endDate) {
       this.idealBurndown = ['ideal'];
       this.idealX = ['idealX'];
       this.actualBurndown = ['actual'];
       this.actualX = ['actualX'];
       var startingBalance = category.balance - category.activity
-      this.buildActualBurndownData(startingBalance, transactions, startDate, new Date());
+      var actualEndDate = this.selectedMonthIndex == 0 ? new Date() : endDate
+      this.buildActualBurndownData(startingBalance, transactions, startDate, actualEndDate);
       this.buildIdealBurndownData(startingBalance, startDate, endDate);
       this.buildChart();
     },
@@ -3247,22 +3269,43 @@ class UserApi extends BaseAPI {
       this.loading = true;
       this.error = null;
       this.transactions = [];
-      this.api.transactions.getTransactionsByCategory(this.budgetId, this.selectedCategory.id, this.getFirstDayOfMonth()).then((res) => {
-        this.transactions = JSON.parse(JSON.stringify(res.data.transactions)).reverse();
-        this.refreshChartData(this.selectedCategory, res.data.transactions, this.getFirstDayOfMonth(), this.getLastDayOfMonth());
+      this.selectedMonth = this.getDateName(this.selectedMonthIndex);
+      var startDate = this.getFirstDayOfMonth(this.selectedMonthIndex);
+      var endDate = this.getLastDayOfMonth(this.selectedMonthIndex);
+      var categoryTransactions = [];
+      this.api.transactions.getTransactionsByCategory(this.budgetId, this.selectedCategory.id, startDate).then((res) => {
+        categoryTransactions = this.parseCategoryTransactions(res.data.transactions, endDate);
+        this.transactions = JSON.parse(JSON.stringify(categoryTransactions)).reverse(); //immutable list used to display transactions below the chart
+        this.refreshChartData(this.selectedCategory, categoryTransactions, startDate, endDate);
       }).catch((err) => {
         this.error = err.error.detail;
       }).finally(() => {
         this.loading = false;
       });
     },
-    getFirstDayOfMonth() {
+    getFirstDayOfMonth(index) {
       var date = new Date();
-      return new Date(date.getFullYear(), date.getMonth(), 1);
+      return new Date(date.getFullYear(), date.getMonth() + index, 1);
     },
-    getLastDayOfMonth() {
+    getLastDayOfMonth(index) {
       var date = new Date();
-      return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      return new Date(date.getFullYear(), date.getMonth() + 1 + index, 0);
+    },
+    getDateName(index) {
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      var date = new Date();
+      var monthIndex = index%12;
+      var currentMonth = date.getMonth();
+      var yearIndex = (index + currentMonth)/12;
+      if (monthIndex < -currentMonth) {
+        monthIndex += 12
+      }
+      var year = date.getFullYear() + Math.floor(yearIndex);
+      var month = date.getMonth() + monthIndex;
+      return `${monthNames[month]} ${year}`;
     },
     dateDiff(first, second) {
       // Take the difference between the dates and divide by milliseconds per day.
@@ -3296,7 +3339,7 @@ class UserApi extends BaseAPI {
             }
           }
 
-          this.actualBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance).toFixed(2))
+          this.actualBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance, 2))
           this.actualX.push(i + 1)
       }
     },
@@ -3305,7 +3348,7 @@ class UserApi extends BaseAPI {
       var balance = startingBalance
       var idealDailySpend = startingBalance / range
       for (var i = 0; i < range; i++) {
-          this.idealBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance).toFixed(2))
+          this.idealBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance, 2))
           this.idealX.push(i + 1)
 
           balance = balance - idealDailySpend
@@ -3345,6 +3388,34 @@ class UserApi extends BaseAPI {
           position: 'bottom'
         }
       });
+  },
+  goToPreviousMonth() {
+    this.selectedMonthIndex = this.selectedMonthIndex - 1;
+    this.getTransactionsForSelectedCategory();
+  },
+  goToNextMonth() {
+    this.selectedMonthIndex = this.selectedMonthIndex + 1;
+    this.getTransactionsForSelectedCategory();
+  },
+  filterTransactionsByDate(transactions, endDate) {
+    return transactions.filter(transaction => {
+      if (this.parseDate(transaction.date) < endDate) {
+        return transaction;
+      }
+    });
+  },
+  parseCategoryTransactions(categoryTransactions, endDate) {
+    categoryTransactions = this.filterTransactionsByDate(categoryTransactions, endDate);
+    categoryTransactions.map(transaction => {
+      if (transaction.parent_transaction_id) {
+        var parentTransaction = this.allTransactions.find(t => t.id === transaction.parent_transaction_id);
+        if (parentTransaction) {
+          transaction.payee_name = parentTransaction.payee_name;
+          transaction.category_name = `${transaction.category_name} (Split ${parentTransaction.subtransactions.length} categories)`;
+        }
+      }
+    });
+    return categoryTransactions;
   },
   // Now we can make this method available to our template
   // So we can format this milliunits in the correct currency format
@@ -11939,7 +12010,7 @@ process.umask = function() { return 0; };
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(3);
 /* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_bfccf32c_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7ae86105_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(36);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
 /* script */
 
@@ -11957,8 +12028,8 @@ var __vue_module_identifier__ = null
 
 var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
   __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_bfccf32c_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_bfccf32c_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["b" /* staticRenderFns */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7ae86105_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7ae86105_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__["b" /* staticRenderFns */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
@@ -14192,7 +14263,7 @@ var staticRenderFns = []
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_CategoryBurndown_vue__ = __webpack_require__(6);
 /* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_488c8b25_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_fd797b8e_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
 /* script */
 
@@ -14210,8 +14281,8 @@ var __vue_module_identifier__ = null
 
 var Component = Object(__WEBPACK_IMPORTED_MODULE_2__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
   __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_selector_type_script_index_0_CategoryBurndown_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_488c8b25_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_488c8b25_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__["b" /* staticRenderFns */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_fd797b8e_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_fd797b8e_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_CategoryBurndown_vue__["b" /* staticRenderFns */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
@@ -14239,8 +14310,8 @@ var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"categoryBurndown"},[_vm._m(0),_vm._v(" "),_c('div',{staticClass:"row",attrs:{"id":"selectCategoryDropdown"}},[_c('div',{staticClass:"col-xs-4"},[_c('select',{directives:[{name:"model",rawName:"v-model",value:(_vm.selectedCategory),expression:"selectedCategory"}],staticClass:"form-control",on:{"change":[function($event){var $$selectedVal = Array.prototype.filter.call($event.target.options,function(o){return o.selected}).map(function(o){var val = "_value" in o ? o._value : o.value;return val}); _vm.selectedCategory=$event.target.multiple ? $$selectedVal : $$selectedVal[0]},function($event){_vm.selectCategory(_vm.selectedCategory)}]}},[_c('option',{attrs:{"value":"","disabled":"","selected":""}},[_vm._v("Choose a category")]),_vm._v(" "),_vm._l((_vm.categories),function(category){return _c('option',{domProps:{"value":category}},[_vm._v("\n          "+_vm._s(category.name)+"\n        ")])})],2)])]),_vm._v(" "),_c('div',{staticClass:"row"},[_vm._v("\n      Track how much you have left in your budget for a category in a month and how quickly you are spending it. This helps you gauge if you are on track to meet your budget goals or if you should slow down your spending in a category. \n  ")]),_vm._v(" "),(_vm.selectedCategory != '')?_c('div',{staticClass:"row"},[_vm._m(1),_vm._v(" "),_c('Transactions',{attrs:{"transactions":_vm.transactions}})],1):_vm._e()])}
-var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"row"},[_c('h1',[_vm._v("Category Burndown Chart")])])},function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"col-xs-4"},[_c('div',{attrs:{"id":"chart"}})])}]
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{},[_vm._m(0),_vm._v(" "),_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-xs-6 col-lg-4 pt-3 px-4"},[_c('div',{staticClass:"d-flex flex-wrap flex-md-nowrap pb-2 mb-3"},[_c('select',{directives:[{name:"model",rawName:"v-model",value:(_vm.selectedCategory),expression:"selectedCategory"}],staticClass:"form-control",on:{"change":[function($event){var $$selectedVal = Array.prototype.filter.call($event.target.options,function(o){return o.selected}).map(function(o){var val = "_value" in o ? o._value : o.value;return val}); _vm.selectedCategory=$event.target.multiple ? $$selectedVal : $$selectedVal[0]},function($event){_vm.getTransactionsForSelectedCategory(_vm.selectedCategory)}]}},[_c('option',{attrs:{"value":"","disabled":"","selected":""}},[_vm._v("Choose a category")]),_vm._v(" "),_vm._l((_vm.categories),function(category){return _c('option',{domProps:{"value":category}},[_vm._v("\n              "+_vm._s(category.name)+"\n            ")])})],2)])])]),_vm._v(" "),(_vm.selectedCategory != '')?_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4"},[_c('div',{staticClass:"d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom"},[_c('h1',{staticClass:"h2"},[_vm._v(_vm._s(_vm.selectedMonth))]),_vm._v(" "),_c('div',{staticClass:"mb-2 mb-md-0"},[_c('div',{staticClass:"btn-group mr-2"},[_c('button',{staticClass:"btn btn-outline-secondary",attrs:{"type":"button"},on:{"click":function($event){_vm.goToPreviousMonth()}}},[_vm._v("Previous Month")]),_vm._v(" "),(_vm.selectedMonthIndex < 0)?_c('button',{staticClass:"btn btn-outline-secondary",attrs:{"type":"button"},on:{"click":function($event){_vm.goToNextMonth()}}},[_vm._v("Next Month")]):_vm._e()])])])]),_vm._v(" "),_c('div',{staticClass:"col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4"},[_c('div',{attrs:{"id":"chart"}}),_vm._v(" "),_c('Transactions',{attrs:{"transactions":_vm.transactions}})],1)]):_vm._e()])}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"row"},[_c('div',{staticClass:"col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4"},[_c('h1',[_vm._v("Category Burndown Chart")]),_vm._v(" "),_c('span',[_vm._v("Track how much you have left in your budget for a category in a month and how quickly you are spending it. This helps you gauge if you are on track to meet your budget goals or if you should slow down your spending in a category.")])])])}]
 
 
 /***/ }),
@@ -14250,7 +14321,7 @@ var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{attrs:{"id":"app"}},[_c('Nav'),_vm._v(" "),_c('div',{staticClass:"container"},[(_vm.loading)?_c('h1',{staticClass:"display-4"},[_vm._v("Loading...")]):_c('div',[(_vm.error)?_c('div',[_c('h1',{staticClass:"display-4"},[_vm._v("Oops!")]),_vm._v(" "),_c('p',{staticClass:"lead"},[_vm._v(_vm._s(_vm.error))]),_vm._v(" "),_c('button',{staticClass:"btn btn-primary",on:{"click":_vm.resetToken}},[_vm._v("Try Again >")])]):_c('div',[(!_vm.ynab.token)?_c('form',[_c('div',{staticClass:"form-group"},[_c('h1',{staticClass:"display-5"},[_vm._v("Hello!")]),_vm._v(" "),_c('p',{staticClass:"lead"},[_vm._v("If you would like to use this App, please authorize with YNAB!")]),_vm._v(" "),_c('button',{staticClass:"btn btn-primary",on:{"click":_vm.authorizeWithYNAB}},[_vm._v("Authorize This App With YNAB >")])])]):(!_vm.budgetId)?_c('Budgets',{attrs:{"budgets":_vm.budgets,"selectBudget":_vm.selectBudget}}):_c('div',[_c('CategoryBurndown',{attrs:{"budgetId":_vm.budgetId,"categories":_vm.categories,"api":_vm.api}}),_vm._v(" "),_c('div',{staticClass:"row"},[_c('button',{staticClass:"btn btn-info back-button",on:{"click":function($event){_vm.budgetId = null}}},[_vm._v("< Select Another Budget")])])],1)],1)]),_vm._v(" "),_c('Footer')],1)],1)}
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{attrs:{"id":"app"}},[_c('Nav'),_vm._v(" "),_c('div',{staticClass:"container"},[(_vm.loading)?_c('h1',{staticClass:"display-4"},[_vm._v("Loading...")]):_c('div',[(_vm.error)?_c('div',[_c('h1',{staticClass:"display-4"},[_vm._v("Oops!")]),_vm._v(" "),_c('p',{staticClass:"lead"},[_vm._v(_vm._s(_vm.error))]),_vm._v(" "),_c('button',{staticClass:"btn btn-primary",on:{"click":_vm.resetToken}},[_vm._v("Try Again >")])]):_c('div',[(!_vm.ynab.token)?_c('form',[_c('div',{staticClass:"form-group"},[_c('h1',{staticClass:"display-5"},[_vm._v("Hello!")]),_vm._v(" "),_c('p',{staticClass:"lead"},[_vm._v("If you would like to use this App, please authorize with YNAB!")]),_vm._v(" "),_c('button',{staticClass:"btn btn-primary",on:{"click":_vm.authorizeWithYNAB}},[_vm._v("Authorize This App With YNAB >")])])]):(!_vm.budgetId)?_c('Budgets',{attrs:{"budgets":_vm.budgets,"selectBudget":_vm.selectBudget}}):_c('div',[_c('CategoryBurndown',{attrs:{"budgetId":_vm.budgetId,"categories":_vm.categories,"api":_vm.api,"allTransactions":_vm.allTransactions}}),_vm._v(" "),_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4"},[_c('button',{staticClass:"btn btn-info back-button",on:{"click":function($event){_vm.budgetId = null}}},[_vm._v("< Select Another Budget")])])])],1)],1)]),_vm._v(" "),_c('Footer')],1)],1)}
 var staticRenderFns = []
 
 
