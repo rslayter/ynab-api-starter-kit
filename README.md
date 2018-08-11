@@ -1,6 +1,6 @@
-# YNAB Burndown
+# YNAB Category Tracker
 
-A simple web app to show a dashboard of the most important details of your budget, all in one place.
+A tool to help you track how much you have left in your budget for a category in a month and how quickly you are spending it.
 
 ## Demo
 

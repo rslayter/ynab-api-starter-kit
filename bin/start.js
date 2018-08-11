@@ -6,8 +6,8 @@ const cpr = require('cpr');
 const chalk = require('chalk');
 const spawn = require('child_process').spawn;
 
-process.title = 'ynab-dashboard';
-const TO = path.resolve(process.cwd(), process.argv[2] || 'ynab-dashboard');
+process.title = 'ynab-category-tracker';
+const TO = path.resolve(process.cwd(), process.argv[2] || 'ynab-category-tracker');
 const FROM = path.resolve(__dirname, '..');
 
 const files = [
@@ -20,7 +20,7 @@ const files = [
 
 // Main
 
-console.log(chalk.green('## YNAB Burndown ##'));
+console.log(chalk.green('## YNAB Category Tracker ##'));
 copyFiles(function () {
   installDeps(function () {
     startServer()

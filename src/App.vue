@@ -2,28 +2,33 @@
   <div id="app">
     <Nav />
     <div class="container">
-      <h1 v-if="loading" class="display-4">Loading...</h1>
-      <div v-else>
-        <div v-if="error">
-          <h1 class="display-4">Oops!</h1>
-          <p class="lead">{{error}}</p>
-          <button class="btn btn-primary" @click="resetToken">Try Again &gt;</button>
-        </div>
-        <div v-else>
-          <form v-if="!ynab.token">
-            <div class="form-group">
-              <h1 class="display-5">Hello!</h1>
-              <p class="lead">If you would like to use this App, please authorize with YNAB!</p>
-              <button @click="authorizeWithYNAB" class="btn btn-primary">Authorize This App With YNAB &gt;</button>
-            </div>
-          </form>
-          <Budgets v-else-if="!budgetId" :budgets="budgets" :selectBudget="selectBudget" />
+      <div class="row">
+        <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
+          <h1>Category Tracker</h1>
+          <h3 v-if="loading" class="display-4">Loading...</h3>
           <div v-else>
-            <!-- Show the burndown chart for the selected budget -->
-            <CategoryBurndown :budgetId="budgetId" :categories="categories" :api="api" :allTransactions="allTransactions"/>
-            <div class="row">
-              <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
-                <button class="btn btn-info back-button" @click="budgetId = null">&lt; Select Another Budget</button>
+            <div v-if="error">
+              <h3 class="display-4">Oops!</h3>
+              <p class="lead">{{error}}</p>
+              <button class="btn btn-primary" @click="resetToken">Try Again &gt;</button>
+            </div>
+            <div v-else>
+              <form v-if="!ynab.token">
+                <div class="form-group">
+                  <h3 class="display-5">Hello!</h3>
+                  <p class="lead">If you would like to use this App, please authorize with YNAB!</p>
+                  <button @click="authorizeWithYNAB" class="btn btn-primary">Authorize This App With YNAB &gt;</button>
+                </div>
+              </form>
+              <Budgets v-else-if="!budgetId" :budgets="budgets" :selectBudget="selectBudget" />
+              <div v-else>
+                <!-- Show the burndown chart for the selected budget -->
+                <CategoryBurndown :budgetId="budgetId" :categories="categories" :api="api" :allTransactions="allTransactions"/>
+                <div class="row">
+                  <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
+                    <button class="btn btn-info back-button" @click="budgetId = null">&lt; Select Another Budget</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -41,7 +46,6 @@ import Nav from './components/Nav.vue';
 import Footer from './components/Footer.vue';
 import Budgets from './components/Budgets.vue';
 import CategoryBurndown from './components/CategoryBurndown.vue';
-import Transactions from './components/Transactions.vue';
 
 export default {
   data () {
@@ -56,7 +60,6 @@ export default {
       error: null,
       budgetId: null,
       budgets: [],
-      transactions: [],
       categories: [],
       allTransactions: []
     }
@@ -152,8 +155,7 @@ export default {
     Nav,
     Footer,
     Budgets,
-    CategoryBurndown,
-    Transactions
+    CategoryBurndown
   }
 }
 </script>

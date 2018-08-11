@@ -1,11 +1,6 @@
 <template>
-  <div class="">
-    <div class="row">
-      <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
-        <h1>Category Burndown Chart</h1>
-        <span>Track how much you have left in your budget for a category in a month and how quickly you are spending it. This helps you gauge if you are on track to meet your budget goals or if you should slow down your spending in a category.</span>
-      </div>
-    </div>
+  <div>
+    <span>Track how much you have left in your budget for a category in a month and how quickly you are spending it. This helps you gauge if you are on track to meet your budget goals or if you should slow down your spending in a category.</span>
     <div class="row">
       <div class="col-xs-6 col-lg-4 pt-3 px-4">
           <div class="d-flex flex-wrap flex-md-nowrap pb-2 mb-3">
@@ -18,9 +13,6 @@
           </div>
       </div>
     </div>
-    <!-- <div class="row">
-        Track how much you have left in your budget for a category in a month and how quickly you are spending it. This helps you gauge if you are on track to meet your budget goals or if you should slow down your spending in a category.
-    </div> -->
     <div class="row" v-if="selectedCategory != ''">
       <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
@@ -54,17 +46,17 @@ export default {
       selectedCategory: '',
       startingBalance: 0,
       transactions: [],
-      idealBurndown: ['ideal'],
-      actualBurndown: ['actual'],
+      idealBurndown: ['Budgeted'],
+      actualBurndown: ['Actual Spending'],
       idealX: ['idealX', 1, 2, 3, 4, 5, 6],
       actualX: ['actualX', 1,2, 3, 4]
     }
   },
   methods: {
     refreshChartData(category, transactions, startDate, endDate) {
-      this.idealBurndown = ['ideal'];
+      this.idealBurndown = ['Budgeted'];
       this.idealX = ['idealX'];
-      this.actualBurndown = ['actual'];
+      this.actualBurndown = ['Actual Spending'];
       this.actualX = ['actualX'];
       // var startingBalance = category.balance - category.activity
       var actualEndDate = this.selectedMonthIndex == 0 ? new Date() : endDate
@@ -182,8 +174,8 @@ export default {
       var chart = c3.generate({
         data: {
         xs: {
-            'ideal': 'idealX',
-            'actual': 'actualX',
+            'Budgeted': 'idealX',
+            'Actual Spending': 'actualX',
         },
         columns: [
             this.idealX, this.actualX, this.idealBurndown, this.actualBurndown
