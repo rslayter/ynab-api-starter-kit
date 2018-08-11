@@ -1,26 +1,42 @@
 <template>
-  <div class="categoryBurndown">
+  <div class="">
     <div class="row">
-      <h1>Category Burndown Chart</h1>
-    </div>
-    <div id="selectCategoryDropdown" class="row">
-      <div class="col-xs-4">
-        <select class="form-control" v-model="selectedCategory" v-on:change="selectCategory(selectedCategory)">
-          <option value="" disabled selected>Choose a category</option>
-          <option v-for="category in categories" :value="category">
-            {{category.name}}
-          </option>
-        </select>
+      <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
+        <h1>Category Burndown Chart</h1>
+        <span>Track how much you have left in your budget for a category in a month and how quickly you are spending it. This helps you gauge if you are on track to meet your budget goals or if you should slow down your spending in a category.</span>
       </div>
     </div>
     <div class="row">
-        Track how much you have left in your budget for a category in a month and how quickly you are spending it. This helps you gauge if you are on track to meet your budget goals or if you should slow down your spending in a category. 
+      <div class="col-xs-6 col-lg-4 pt-3 px-4">
+          <div class="d-flex flex-wrap flex-md-nowrap pb-2 mb-3">
+            <select class="form-control" v-model="selectedCategory" v-on:change="getTransactionsForSelectedCategory(selectedCategory)">
+              <option value="" disabled selected>Choose a category</option>
+              <option v-for="category in categories" :value="category">
+                {{category.name}}
+              </option>
+            </select>
+          </div>
+      </div>
     </div>
+    <!-- <div class="row">
+        Track how much you have left in your budget for a category in a month and how quickly you are spending it. This helps you gauge if you are on track to meet your budget goals or if you should slow down your spending in a category.
+    </div> -->
     <div class="row" v-if="selectedCategory != ''">
-      <div class="col-xs-4">
-          <div id="chart"></div>
+      <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+          <h1 class="h2">{{selectedMonth}}</h1>
+          <div class="mb-2 mb-md-0">
+              <div class="btn-group mr-2">
+                <button class="btn btn-outline-secondary" type="button" @click="goToPreviousMonth()">Previous Month</button>
+                <button class="btn btn-outline-secondary" v-if="selectedMonthIndex < 0" type="button" @click="goToNextMonth()">Next Month</button>
+              </div>
+          </div>
+        </div>
       </div>
-      <Transactions :transactions="transactions" />
+      <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
+          <div id="chart"></div>
+          <Transactions :transactions="transactions" />
+      </div>
     </div>
   </div>
 </template>
@@ -30,9 +46,11 @@ import {utils} from 'ynab';
 import Transactions from './Transactions.vue';
 
 export default {
-  props: ['categories', 'budgetId', 'api'],
+  props: ['categories', 'budgetId', 'api', 'allTransactions'],
   data () {
     return {
+      selectedMonthIndex: 0,
+      selectedMonth: '',
       selectedCategory: '',
       transactions: [],
       idealBurndown: ['ideal'],
@@ -42,19 +60,14 @@ export default {
     }
   },
   methods: {
-    selectCategory(category) {
-      //TODO generate idealBurndown
-      //TODO get actual burndown
-      //TODO populate x and y axis
-      this.getTransactionsForSelectedCategory()
-    },
     refreshChartData(category, transactions, startDate, endDate) {
       this.idealBurndown = ['ideal'];
       this.idealX = ['idealX'];
       this.actualBurndown = ['actual'];
       this.actualX = ['actualX'];
       var startingBalance = category.balance - category.activity
-      this.buildActualBurndownData(startingBalance, transactions, startDate, new Date());
+      var actualEndDate = this.selectedMonthIndex == 0 ? new Date() : endDate
+      this.buildActualBurndownData(startingBalance, transactions, startDate, actualEndDate);
       this.buildIdealBurndownData(startingBalance, startDate, endDate);
       this.buildChart();
     },
@@ -62,22 +75,43 @@ export default {
       this.loading = true;
       this.error = null;
       this.transactions = [];
-      this.api.transactions.getTransactionsByCategory(this.budgetId, this.selectedCategory.id, this.getFirstDayOfMonth()).then((res) => {
-        this.transactions = JSON.parse(JSON.stringify(res.data.transactions)).reverse();
-        this.refreshChartData(this.selectedCategory, res.data.transactions, this.getFirstDayOfMonth(), this.getLastDayOfMonth());
+      this.selectedMonth = this.getDateName(this.selectedMonthIndex);
+      var startDate = this.getFirstDayOfMonth(this.selectedMonthIndex);
+      var endDate = this.getLastDayOfMonth(this.selectedMonthIndex);
+      var categoryTransactions = [];
+      this.api.transactions.getTransactionsByCategory(this.budgetId, this.selectedCategory.id, startDate).then((res) => {
+        categoryTransactions = this.parseCategoryTransactions(res.data.transactions, endDate);
+        this.transactions = JSON.parse(JSON.stringify(categoryTransactions)).reverse(); //immutable list used to display transactions below the chart
+        this.refreshChartData(this.selectedCategory, categoryTransactions, startDate, endDate);
       }).catch((err) => {
         this.error = err.error.detail;
       }).finally(() => {
         this.loading = false;
       });
     },
-    getFirstDayOfMonth() {
+    getFirstDayOfMonth(index) {
       var date = new Date();
-      return new Date(date.getFullYear(), date.getMonth(), 1);
+      return new Date(date.getFullYear(), date.getMonth() + index, 1);
     },
-    getLastDayOfMonth() {
+    getLastDayOfMonth(index) {
       var date = new Date();
-      return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      return new Date(date.getFullYear(), date.getMonth() + 1 + index, 0);
+    },
+    getDateName(index) {
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      var date = new Date();
+      var monthIndex = index%12;
+      var currentMonth = date.getMonth();
+      var yearIndex = (index + currentMonth)/12;
+      if (monthIndex < -currentMonth) {
+        monthIndex += 12
+      }
+      var year = date.getFullYear() + Math.floor(yearIndex);
+      var month = date.getMonth() + monthIndex;
+      return `${monthNames[month]} ${year}`;
     },
     dateDiff(first, second) {
       // Take the difference between the dates and divide by milliseconds per day.
@@ -111,7 +145,7 @@ export default {
             }
           }
 
-          this.actualBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance).toFixed(2))
+          this.actualBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance, 2))
           this.actualX.push(i + 1)
       }
     },
@@ -120,7 +154,7 @@ export default {
       var balance = startingBalance
       var idealDailySpend = startingBalance / range
       for (var i = 0; i < range; i++) {
-          this.idealBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance).toFixed(2))
+          this.idealBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance, 2))
           this.idealX.push(i + 1)
 
           balance = balance - idealDailySpend
@@ -160,6 +194,34 @@ export default {
           position: 'bottom'
         }
       });
+  },
+  goToPreviousMonth() {
+    this.selectedMonthIndex = this.selectedMonthIndex - 1;
+    this.getTransactionsForSelectedCategory();
+  },
+  goToNextMonth() {
+    this.selectedMonthIndex = this.selectedMonthIndex + 1;
+    this.getTransactionsForSelectedCategory();
+  },
+  filterTransactionsByDate(transactions, endDate) {
+    return transactions.filter(transaction => {
+      if (this.parseDate(transaction.date) < endDate) {
+        return transaction;
+      }
+    });
+  },
+  parseCategoryTransactions(categoryTransactions, endDate) {
+    categoryTransactions = this.filterTransactionsByDate(categoryTransactions, endDate);
+    categoryTransactions.map(transaction => {
+      if (transaction.parent_transaction_id) {
+        var parentTransaction = this.allTransactions.find(t => t.id === transaction.parent_transaction_id);
+        if (parentTransaction) {
+          transaction.payee_name = parentTransaction.payee_name;
+          transaction.category_name = `${transaction.category_name} (Split ${parentTransaction.subtransactions.length} categories)`;
+        }
+      }
+    });
+    return categoryTransactions;
   },
   // Now we can make this method available to our template
   // So we can format this milliunits in the correct currency format

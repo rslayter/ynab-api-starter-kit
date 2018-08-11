@@ -20,9 +20,11 @@
           <Budgets v-else-if="!budgetId" :budgets="budgets" :selectBudget="selectBudget" />
           <div v-else>
             <!-- Show the burndown chart for the selected budget -->
-            <CategoryBurndown :budgetId="budgetId" :categories="categories" :api="api"/>
+            <CategoryBurndown :budgetId="budgetId" :categories="categories" :api="api" :allTransactions="allTransactions"/>
             <div class="row">
-              <button class="btn btn-info back-button" @click="budgetId = null">&lt; Select Another Budget</button>
+              <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
+                <button class="btn btn-info back-button" @click="budgetId = null">&lt; Select Another Budget</button>
+              </div>
             </div>
           </div>
         </div>
@@ -55,7 +57,8 @@ export default {
       budgetId: null,
       budgets: [],
       transactions: [],
-      categories: []
+      categories: [],
+      allTransactions: []
     }
   },
   // When this component is created, check whether we need to get a token,
@@ -104,6 +107,12 @@ export default {
         this.loading = false;
       });
 
+      this.allTransactions = [];
+      this.api.transactions.getTransactions(id).then((res) => {
+        this.allTransactions = res.data.transactions;
+      }).catch((err) => {
+        this.error = err.error.detail;
+      });
     },
     // This builds a URI to get an access token from YNAB
     // https://api.youneedabudget.com/#outh-applications
