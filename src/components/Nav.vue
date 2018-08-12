@@ -3,7 +3,7 @@
     <h5 class="my-0 mr-md-auto font-weight-normal">
       YNAB Category Tracker
     </h5>
-    <a href="#/" @click="resetToken">Log out</a>
+    <a href="#/" @click="resetToken">Home</a>
   </div>
 </template>
 
