@@ -1,6 +1,6 @@
 {
     "name": "YNAB Category Tracker",
     "description": "A tool to help you track how much you have left in your budget for a category in a month and how quickly you are spending it.",
-    "repository": "https://github.com/rslayter/ynab-api-starter-kit,
+    "repository": "https://github.com/rslayter/ynab-category-tracker,
     "keywords": ["ynab"]
 }

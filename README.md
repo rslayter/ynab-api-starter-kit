@@ -4,12 +4,12 @@ A tool to help you track how much you have left in your budget for a category in
 
 ## Demo
 
-View a [live demo](https://rslayter.github.io/ynab-api-starter-kit/) of the project!
+View a [live demo](https://rslayter.github.io/ynab-category-tracker/) of the project!
 
 ## Usage
 
 * Install [Node.js](https://nodejs.org/).
-* Use git to clone it: `git clone https://github.com/rslayter/ynab-api-starter-kit`
+* Use git to clone it: `git clone https://github.com/rslayter/ynab-category-tracker`
 * From within the folder, run `npm install`
 * Then run `npm start`
 

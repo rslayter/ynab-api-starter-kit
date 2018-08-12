@@ -14106,7 +14106,7 @@ module.exports = self.fetch.bind(self);
 /* 25 */
 /***/ (function(module, exports) {
 
-module.exports = {"clientId":"e5a021da2a19f7c0c93879f37ab0f1b65f61ce8cc9a808793513fb605013edbc","redirectUri":"https://rslayter.github.io/ynab-api-starter-kit/"}
+module.exports = {"clientId":"e5a021da2a19f7c0c93879f37ab0f1b65f61ce8cc9a808793513fb605013edbc","redirectUri":"https://rslayter.github.io/ynab-category-tracker/"}
 
 /***/ }),
 /* 26 */
@@ -14157,7 +14157,7 @@ var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_58a33809_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_384120d2_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__ = __webpack_require__(0);
 /* script */
 var __vue_script__ = null
@@ -14174,8 +14174,8 @@ var __vue_module_identifier__ = null
 
 var Component = Object(__WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_runtime_component_normalizer__["a" /* default */])(
   __vue_script__,
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_58a33809_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__["a" /* render */],
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_58a33809_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__["b" /* staticRenderFns */],
+  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_384120d2_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__["a" /* render */],
+  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_384120d2_hasScoped_false_optionsId_0_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Footer_vue__["b" /* staticRenderFns */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
@@ -14193,7 +14193,7 @@ var Component = Object(__WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return render; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return staticRenderFns; });
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _vm._m(0)}
-var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('footer',{staticClass:"pt-4 my-md-5 pt-md-5 border-top"},[_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-12 col-md"},[_c('small',{staticClass:"text-muted"},[_vm._v("MADE BY")]),_vm._v(" "),_c('h5',[_c('a',{attrs:{"href":"https://github.com/rslayter/ynab-api-starter-kit"}},[_vm._v("Rachel Slayter and Zachary Slayter")])])])])])}]
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('footer',{staticClass:"pt-4 my-md-5 pt-md-5 border-top"},[_c('div',{staticClass:"row"},[_c('div',{staticClass:"col-12 col-md"},[_c('small',{staticClass:"text-muted"},[_vm._v("MADE BY")]),_vm._v(" "),_c('h5',[_c('a',{attrs:{"href":"https://github.com/rslayter/ynab-category-tracker"}},[_vm._v("Rachel Slayter and Zachary Slayter")])])])])])}]
 
 
 /***/ }),
