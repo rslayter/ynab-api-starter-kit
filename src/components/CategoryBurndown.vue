@@ -27,6 +27,11 @@
       </div>
       <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
           <div id="chart"></div>
+          <div v-if="selectedMonthIndex === 0 && idealRemaining >= 0">
+            <p class="lead">You have ${{remainingBalance}} remaining in {{selectedCategory.name}} today. According to your budget, you should have ${{idealRemaining}} remaining.</p>
+            <p class="alert alert-danger" v-if="remainingBalance < idealRemaining">You are spending more than you budgeted this month. Slow down your spending or budget more for this category to stay on track.</p>
+            <p v-else class="alert alert-success">You are doing great! Keep up the good work!</p>
+          </div>
           <Transactions :transactions="transactions" />
       </div>
     </div>
@@ -45,11 +50,14 @@ export default {
       selectedMonth: '',
       selectedCategory: '',
       startingBalance: 0,
+      remainingBalance: 0,
+      idealRemaining: -1,
+      activity: 0,
       transactions: [],
       idealBurndown: ['Budgeted'],
       actualBurndown: ['Actual Spending'],
-      idealX: ['idealX', 1, 2, 3, 4, 5, 6],
-      actualX: ['actualX', 1,2, 3, 4]
+      idealX: ['idealX'],
+      actualX: ['actualX']
     }
   },
   methods: {
@@ -58,7 +66,6 @@ export default {
       this.idealX = ['idealX'];
       this.actualBurndown = ['Actual Spending'];
       this.actualX = ['actualX'];
-      // var startingBalance = category.balance - category.activity
       var actualEndDate = this.selectedMonthIndex == 0 ? new Date() : endDate
       this.buildActualBurndownData(this.startingBalance, transactions, startDate, actualEndDate);
       this.buildIdealBurndownData(this.startingBalance, startDate, endDate);
@@ -69,7 +76,9 @@ export default {
       this.error = null
       this.api.months.getBudgetMonth(this.budgetId, startDate).then((res) => {
         var categoryMonth = res.data.month.categories.find(cat => cat.id === category.id);
-        this.startingBalance = categoryMonth.balance - categoryMonth.activity
+        this.startingBalance = categoryMonth.balance - categoryMonth.activity;
+        this.activity = this.convertMilliUnitsToCurrencyAmount(categoryMonth.activity);
+        this.remainingBalance = this.convertMilliUnitsToCurrencyAmount(categoryMonth.balance);
         this.refreshChartData(this.selectedCategory, categoryTransactions, startDate, endDate);
       }).catch((err) => {
         this.error = err.error.detail;
@@ -136,37 +145,43 @@ export default {
       return new Date(parts[0], parts[1] - 1, parts[2]);
     },
     buildActualBurndownData(startingBalance, transactions, startDate, endDate) {
-      var range = this.dateDiff(startDate, endDate)
-      var balance = startingBalance
-      var remainingTransactions = transactions
+      var range = this.dateDiff(startDate, endDate);
+      var balance = startingBalance;
+      var remainingTransactions = transactions;
       for (var i = 0; i < range; i++) {
           var dataDate = this.addDays(startDate, i)
           while (remainingTransactions.length > 0) {
-            var transactionDate = this.parseDate(remainingTransactions[0].date)
+            var transactionDate = this.parseDate(remainingTransactions[0].date);
             if (dataDate.getTime() === transactionDate.getTime()) {
-              balance += remainingTransactions[0].amount
-              remainingTransactions.shift()
+              balance += remainingTransactions[0].amount;
+              remainingTransactions.shift();
             } else {
-              break
+              break;
             }
           }
 
-          this.actualBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance, 2))
-          this.actualX.push(i + 1)
+          this.actualBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance, 2));
+          this.actualX.push(i + 1);
       }
     },
     buildIdealBurndownData(startingBalance, startDate, endDate) {
-      var range = this.dateDiff(startDate, endDate)
-      var balance = startingBalance
-      var idealDailySpend = startingBalance / range
-      idealDailySpend += idealDailySpend / range
+      var range = this.dateDiff(startDate, endDate);
+      var currentDayOfMonth = -1;
+      if (this.selectedMonthIndex === 0) {
+        currentDayOfMonth = this.dateDiff(startDate, new Date()) - 1;
+      }
+      var balance = startingBalance;
+      var idealDailySpend = startingBalance / range;
+      idealDailySpend += idealDailySpend / range;
       for (var i = 0; i < range; i++) {
-          this.idealBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance, 2))
-          this.idealX.push(i + 1)
-
-          balance = balance - idealDailySpend
+          this.idealBurndown.push(this.convertMilliUnitsToCurrencyAmount(balance, 2));
+          this.idealX.push(i + 1);
+          if (i === currentDayOfMonth) {
+            this.idealRemaining = this.convertMilliUnitsToCurrencyAmount(balance, 2);
+          }
+          balance = balance - idealDailySpend;
           if (i === range - 2) {
-            balance = 0
+            balance = 0;
           }
       }
     },
@@ -202,6 +217,17 @@ export default {
         },
         legend: {
           position: 'bottom'
+        },
+        color: {
+          pattern: ['#2cadbf', '#ea644e']
+        },
+        tooltip: {
+          format: {
+            title: function(d) {return 'Day ' + d;}
+          }
+        },
+        transition: {
+          duration: 1000
         }
       });
   },
