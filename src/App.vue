@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Nav />
+    <Nav :resetToken="resetToken"/>
     <div class="container">
       <div class="row">
         <div class="col-xs-12 ml-sm-auto col-lg-12 pt-3 px-4">
@@ -15,8 +15,8 @@
             <div v-else>
               <form v-if="!ynab.token">
                 <div class="form-group">
-                  <h3 class="display-5">Hello!</h3>
-                  <p class="lead">If you would like to use this App, please authorize with YNAB!</p>
+                  <p class="lead">A tool to help you track how much you have left in your budget for a category in a month and how quickly you are spending it.</p>
+                  <p class="lead">This tool is designed to get your existing budget data and display it in a way that helps you visualize your spending habits better. We will never add, modify, or delete anything in your budget. If you would like to use this App, please authorize with YNAB!</p>
                   <button @click="authorizeWithYNAB" class="btn btn-primary">Authorize This App With YNAB &gt;</button>
                 </div>
               </form>
