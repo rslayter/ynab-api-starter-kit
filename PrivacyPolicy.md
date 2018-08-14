@@ -1,0 +1,3 @@
+Privacy Policy
+
+This app gets transaction and budget data and displays it in an easy to understand manner. We do not store any of your data, and we do not send your data to anyone. We use an OAuth 2.0 flow through YNAB, which means we never even see your username or password, so we do not and can not store it or send it to anyone. You can revoke access to this application at any point through your YNAB account. This application is also on https, which is a secure browsing protocol that protects your information. We guarantee that any data obtained through the API will not unknowingly be passed to any third-party.
